@@ -2090,7 +2090,6 @@ public class StatusBar extends SystemUI implements DemoMode,
         public void update() {
             setPulseOnNewTracks();
             setLockScreenMediaBlurLevel();
-            setQsRowsColumns();
             updateQsPanelResources();
         }
     }
