@@ -51,4 +51,8 @@
     <!-- Ambient Music Ticker -->
     <string name="ambientmusic_songinfo" formatted="false">%s by %s</string>
 
+    <!-- Statusbar Icon Tuner -->
+    <string name="statusbar_items_title">Statusbar icon</string>
+    <string name="statusbar_items_summary">Personalize your statusbar icon visibility</string>
+
 </resources>
