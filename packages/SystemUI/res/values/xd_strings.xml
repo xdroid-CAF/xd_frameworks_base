@@ -72,7 +72,8 @@
     <string name="screenrecord_stopdot_label">Show stop dot</string>
     <string name="screenrecord_lowquality_label">Low quality</string>
 
-    <!-- Reboot/Recovery QS tile -->
+    <!-- Power off/Reboot/Recovery QS Tile -->
+    <string name="quick_settings_poweroff_label">Power off</string>
     <string name="quick_settings_reboot_label">Reboot</string>
     <string name="quick_settings_reboot_recovery_label">Recovery</string>
 
