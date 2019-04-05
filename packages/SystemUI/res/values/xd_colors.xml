@@ -19,4 +19,7 @@
     <!-- QS Drag handle -->
     <color name="xd_qs_footer_drag_handle">#ffc8c8c8</color>
 
+    <!-- Color of the FOD view -->
+    <color name="config_fodColor">#00ff00</color>
+
 </resources>
