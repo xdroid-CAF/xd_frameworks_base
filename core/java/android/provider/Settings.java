@@ -4953,6 +4953,12 @@ public final class Settings {
          * @hide
          */
         public static final String AMBIENT_MUSIC_TICKER = "ambient_music_ticker";
+        
+        /**
+         * Whether to show lock icon on lockscreen
+         * @hide
+         */
+        public static final String LOCKSCREEN_LOCK_ICON = "lockscreen_lock_icon";
 
         /**
          * These are all public system settings
