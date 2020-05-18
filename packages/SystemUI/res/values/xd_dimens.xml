@@ -57,5 +57,6 @@
 
     <!-- Biometric Prompt -->
     <dimen name="biometric_dialog_fod_margin">12dp</dimen>
+    <dimen name="biometric_dialog_fod_default">225dp</dimen>
 
 </resources>
