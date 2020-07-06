@@ -4922,6 +4922,14 @@ public final class Settings {
         public static final String LOCKSCREEN_MEDIA_ART = "lockscreen_media_art";
 
         /**
+         * Data usage period
+         * 0: Daily
+         * 1: Monthly
+         * @hide
+         */
+        public static final String DATA_USAGE_PERIOD = "data_usage_period";
+
+        /**
          * These are all public system settings
          *
          * @hide
