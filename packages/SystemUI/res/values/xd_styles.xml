@@ -16,17 +16,12 @@
 <resources>
 
     <!-- Pixel navbar -->
-    <dimen name="opa_diamond_translation">16dp</dimen>
-    <dimen name="opa_disabled_home_diameter">@dimen/navigation_icon_size</dimen>
-    <dimen name="opa_dot_diam">10dp</dimen>
-    <dimen name="opa_line_x_trans_bg">30dp</dimen>
-    <dimen name="opa_line_x_trans_ry">15dp</dimen>
-    <dimen name="opa_line_y_translation">16dp</dimen>
-
-    <!-- Color for the Assistant invocation lights -->
-    <color name="edge_light_blue">#4185f4</color>
-    <color name="edge_light_green">#3aa853</color>
-    <color name="edge_light_red">#ea4234</color>
-    <color name="edge_light_yellow">#fbbc06</color>
+    <style name="DotStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_centerHorizontal">true</item>
+        <item name="android:layout_centerVertical">true</item>
+        <item name="android:alpha">@null</item>
+    </style>
 
 </resources>
