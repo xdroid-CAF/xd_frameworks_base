@@ -48,4 +48,7 @@
     <!-- Data usage info -->
     <string name="usage_data">used today</string>
 
+    <!-- Ambient Music Ticker -->
+    <string name="ambientmusic_songinfo" formatted="false">%s by %s</string>
+
 </resources>
