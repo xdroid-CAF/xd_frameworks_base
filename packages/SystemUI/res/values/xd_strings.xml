@@ -45,4 +45,7 @@
     <string name="qs_data_switch_changed_1">Switch data card to SIM 1.</string>
     <string name="qs_data_switch_changed_2">Switch data card to SIM 2.</string>
 
+    <!-- Data usage info -->
+    <string name="usage_data">used</string>
+
 </resources>
