@@ -55,4 +55,7 @@
     <!-- FOD icon dimming -->
     <java-symbol type="bool" name="config_targetUsesInKernelDimming" />
 
+    <!-- App Lock -->
+    <java-symbol type="string" name="lockscreen_pattern_instructions" />
+
 </resources>
