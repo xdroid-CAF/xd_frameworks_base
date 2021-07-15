@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<dimen name="status_bar_battery_icon_circle_width">13.5dp</dimen>
+</resources>
