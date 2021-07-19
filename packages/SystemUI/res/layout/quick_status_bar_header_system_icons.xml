@@ -69,6 +69,6 @@
             android:layout_gravity="center_vertical|end"
             android:visibility="gone" />
 
-        <include layout="@layout/ongoing_privacy_chip" android:visibility="gone" />
+        <include layout="@layout/ongoing_privacy_chip" android:layout_toEndOf="@id/network_traffic" />
     </LinearLayout>
 </LinearLayout>
