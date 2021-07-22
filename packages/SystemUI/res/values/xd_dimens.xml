@@ -1,4 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2021 xdroid, xyzprjkt
+     
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
 <resources>
-	<dimen name="status_bar_battery_icon_circle_width">13.5dp</dimen>
+
+    <!-- Clock Center Padding -->
+    <dimen name="status_bar_center_clock_padding_end">0dp</dimen>
+    <dimen name="status_bar_center_clock_padding_start">0dp</dimen>
+    
+    <!-- Battery Circle Style Width -->
+    <dimen name="status_bar_battery_icon_circle_width">13.5dp</dimen>
+    
+    <!-- Pixel navbar -->
+    <dimen name="opa_diamond_translation">16dp</dimen>
+    <dimen name="opa_disabled_home_diameter">@dimen/navigation_icon_size</dimen>
+    <dimen name="opa_dot_diam">10dp</dimen>
+    <dimen name="opa_line_x_trans_bg">30dp</dimen>
+    <dimen name="opa_line_x_trans_ry">15dp</dimen>
+    <dimen name="opa_line_y_translation">16dp</dimen>
+
+    <!-- Color for the Assistant invocation lights -->
+    <color name="edge_light_blue">#4185f4</color>
+    <color name="edge_light_green">#3aa853</color>
+    <color name="edge_light_red">#ea4234</color>
+    <color name="edge_light_yellow">#fbbc06</color>
+
+    <!-- Quick Settings -->
+    <dimen name="quick_settings_top_margin_media">4dp</dimen>
+    <dimen name="quick_settings_top_margin_media_extra">10dp</dimen>
+    <dimen name="qs_media_action_button_margin_top">18dp</dimen>
+    <dimen name="qs_media_action_button_size">48dp</dimen>
+
 </resources>

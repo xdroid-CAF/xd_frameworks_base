@@ -4814,6 +4814,12 @@ public final class Settings {
         public static final String STATUS_BAR_SHOW_BATTERY_PERCENT = "status_bar_show_battery_percent";
 
         /**
+         * Whether or not volume button music controls should be enabled to seek media tracks
+         * @hide
+         */
+        public static final String VOLBTN_MUSIC_CONTROLS = "volbtn_music_controls";
+
+        /**
          * Keys we no longer back up under the current schema, but want to continue to
          * process when restoring historical backup datasets.
          *
@@ -4824,6 +4830,96 @@ public final class Settings {
          */
         public static final String[] LEGACY_RESTORE_SETTINGS = {
         };
+
+        /**
+         * Show or hide clock
+         * 0 - hide
+         * 1 - show (default)
+         * @hide
+         */
+        public static final String STATUSBAR_CLOCK = "statusbar_clock";
+
+        /**
+         * Style of clock
+         * 0 - Left Clock (default)
+         * 1 - Center Clock
+         * 2 - Right Clock
+         * @hide
+         */
+        public static final String STATUSBAR_CLOCK_STYLE = "statusbar_clock_style";
+
+        /** Whether to pulse ambient on new music tracks
+         *
+         * @hide
+         */
+        public static final String PULSE_ON_NEW_TRACKS = "pulse_on_new_tracks";
+
+        /**
+         * Whether to show seconds next to clock in status bar
+         * 0 - hide (default)
+         * 1 - show
+         * @hide
+         */
+        public static final String STATUSBAR_CLOCK_SECONDS = "statusbar_clock_seconds";
+
+        /**
+         * AM/PM Style for clock options
+         * 0 - Normal AM/PM
+         * 1 - Small AM/PM
+         * 2 - No AM/PM  (default)
+         * @hide
+         */
+        public static final String STATUSBAR_CLOCK_AM_PM_STYLE = "statusbar_clock_am_pm_style";
+
+        /**
+         * Shows custom date before clock time
+         * 0 - No Date
+         * 1 - Small Date
+         * 2 - Normal Date
+         * @hide
+         */
+        public static final String STATUSBAR_CLOCK_DATE_DISPLAY = "statusbar_clock_date_display";
+
+        /**
+         * Sets the date string style
+         * 0 - Regular style
+         * 1 - Lowercase
+         * 2 - Uppercase
+         * @hide
+         */
+        public static final String STATUSBAR_CLOCK_DATE_STYLE = "statusbar_clock_date_style";
+
+        /**
+         * Stores the java DateFormat string for the date
+         * @hide
+         */
+        public static final String STATUSBAR_CLOCK_DATE_FORMAT = "statusbar_clock_date_format";
+
+        /**
+         * Position of date
+         * 0 - Left of clock
+         * 1 - Right of clock
+         * @hide
+         */
+        public static final String STATUSBAR_CLOCK_DATE_POSITION = "statusbar_clock_date_position";
+
+        /**
+         * Holds current enabled volume panel implementation
+         * @hide
+         */
+        public static final String SYSTEMUI_PLUGIN_VOLUME = "systemui_plugin_volume";
+
+        /*
+         * Three Finger Gesture from Oppo
+         * @hide
+         */
+        public static final String THREE_FINGER_GESTURE = "three_finger_gesture";
+
+        /*
+         * Lockscreen Media Art
+         * @hide
+         */
+        public static final String LOCKSCREEN_MEDIA_ART = "lockscreen_media_art";
 
         /**
          * These are all public system settings
@@ -4932,6 +5028,16 @@ public final class Settings {
             PRIVATE_SETTINGS.add(EGG_MODE);
             PRIVATE_SETTINGS.add(DISPLAY_COLOR_MODE);
             PRIVATE_SETTINGS.add(CALL_CONNECTED_TONE_ENABLED);
+            PRIVATE_SETTINGS.add(STATUSBAR_CLOCK);
+            PRIVATE_SETTINGS.add(STATUSBAR_CLOCK_STYLE);
+            PRIVATE_SETTINGS.add(STATUSBAR_CLOCK_SECONDS);
+            PRIVATE_SETTINGS.add(STATUSBAR_CLOCK_AM_PM_STYLE);
+            PRIVATE_SETTINGS.add(STATUSBAR_CLOCK_DATE_DISPLAY);
+            PRIVATE_SETTINGS.add(STATUSBAR_CLOCK_DATE_STYLE);
+            PRIVATE_SETTINGS.add(STATUSBAR_CLOCK_DATE_FORMAT);
+            PRIVATE_SETTINGS.add(STATUSBAR_CLOCK_DATE_POSITION);
+            PRIVATE_SETTINGS.add(SYSTEMUI_PLUGIN_VOLUME);
+            PRIVATE_SETTINGS.add(LOCKSCREEN_MEDIA_ART);
         }
 
         /**
@@ -8340,6 +8446,17 @@ public final class Settings {
         public static final int CAMERA_LIFT_TRIGGER_ENABLED_DEFAULT = 1;
 
         /**
+         * Whether the torch launch gesture to long press the power button when the
+         * screen is off should be enabled.
+         *
+         * 0: disabled
+         * 1: long tap power for torch
+         * @hide
+         */
+        public static final String TORCH_POWER_BUTTON_GESTURE =
+                "torch_power_button_gesture";
+
+        /**
          * Whether or not the flashlight (camera torch mode) is available required to turn
          * on flashlight.
          *
@@ -8959,6 +9076,56 @@ public final class Settings {
          * @hide
          */
         public static final String PEOPLE_STRIP = "people_strip";
+
+        /**
+         * Network traffic: Location
+         * 0 - Disabled
+         * 1 - Status bar
+         * 2 - Quick panel
+         * @hide
+         */
+        public static final String NETWORK_TRAFFIC_LOCATION = "network_traffic_location";
+
+        /**
+         * Network traffic: Mode
+         * 0 - All/both
+         * 1 - Upload
+         * 2 - Download
+         * @hide
+         */
+        public static final String NETWORK_TRAFFIC_MODE = "network_traffic_mode";
+
+        /**
+         * Network traffic: Autohide
+         * 0 - Disabled
+         * 1 - Autohide
+         * @hide
+         */
+        public static final String NETWORK_TRAFFIC_AUTOHIDE = "network_traffic_autohide";
+
+        /**
+         * Network traffic: Autohide threshold slider value
+         * @hide
+         */
+        public static final String NETWORK_TRAFFIC_AUTOHIDE_THRESHOLD = "network_traffic_autohide_threshold";
+
+        /**
+         * Network traffic: Refresh interval slider value
+         * @hide
+         */
+        public static final String NETWORK_TRAFFIC_REFRESH_INTERVAL = "network_traffic_refresh_interval";
+
+        /**
+         * Network traffic: Speed units
+         * @hide
+         */
+        public static final String NETWORK_TRAFFIC_UNITS = "network_traffic_units";
+
+        /**
+         * Network traffic: Hide arrows
+         * @hide
+         */
+        public static final String NETWORK_TRAFFIC_HIDEARROW = "network_traffic_hidearrow";
 
         /**
          * Whether or not to enable media resumption
@@ -14931,6 +15098,18 @@ public final class Settings {
         @SdkConstant(SdkConstant.SdkConstantType.ACTIVITY_INTENT_ACTION)
         public static final String ACTION_VOLUME =
                 "android.settings.panel.action.VOLUME";
+
+        /**
+         * Activity Action: Show a settings dialog containing controls for Bluetooth.
+         * <p>
+         * Input: Nothing.
+         * <p>
+         * Output: Nothing.
+         * @hide
+         */
+        @SdkConstant(SdkConstant.SdkConstantType.ACTIVITY_INTENT_ACTION)
+        public static final String ACTION_BLUETOOTH =
+                "android.settings.panel.action.BLUETOOTH";
     }
 
     /**

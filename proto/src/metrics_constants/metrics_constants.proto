@@ -7438,5 +7438,9 @@ message MetricsEvent {
 
     // xdroid
     XD_ZONE = 1998;
+
+     // Panel for Bluetooth
+    PANEL_BLUETOOTH = 9996;
+
   }
 }

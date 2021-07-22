@@ -30,6 +30,9 @@
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
+    <!-- Network traffic monitor -->
+    <uses-permission android:name="android.permission.MAINLINE_NETWORK_STACK" />
+
     <!-- Used to read wallpaper -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
@@ -274,6 +277,15 @@
     <protected-broadcast android:name="com.android.settingslib.action.REGISTER_SLICE_RECEIVER" />
     <protected-broadcast android:name="com.android.settingslib.action.UNREGISTER_SLICE_RECEIVER" />
     <protected-broadcast android:name="com.android.settings.flashlight.action.FLASHLIGHT_CHANGED" />
+
+    <!-- Smart space -->
+    <uses-permission android:name="com.google.android.apps.nexuslauncher.permission.QSB"/>
+    <protected-broadcast android:name="com.google.android.systemui.smartspace.ENABLE_UPDATE"/>
+    <protected-broadcast android:name="com.google.android.systemui.smartspace.EXPIRE_EVENT"/>
+    <protected-broadcast android:name="com.google.android.systemui.smartspace.CLICK_EVENT"/>
+
+    <!-- Ambient Music -->
+    <protected-broadcast android:name="com.android.systemui.doze.pulse" />
 
     <application
         android:name=".SystemUIApplication"
@@ -758,9 +770,8 @@
                 android:resource="@xml/fileprovider" />
         </provider>
 
-        <provider android:name=".keyguard.KeyguardSliceProvider"
+        <provider android:name="com.google.android.systemui.keyguard.KeyguardSliceProviderGoogle"
                   android:authorities="com.android.systemui.keyguard"
-                  android:grantUriPermissions="true"
                   android:exported="true">
         </provider>
 
@@ -789,5 +800,13 @@
             </intent-filter>
         </receiver>
 
+        <receiver android:name=".statusbar.phone.VolumePluginManager">
+            <intent-filter>
+                <action android:name="android.intent.action.PACKAGE_INSTALL" />
+                <action android:name="android.intent.action.PACKAGE_CHANGED" />
+                <action android:name="android.intent.action.PACKAGE_ADDED" />
+                <data android:scheme="package"/>
+            </intent-filter>
+        </receiver>
     </application>
 </manifest>

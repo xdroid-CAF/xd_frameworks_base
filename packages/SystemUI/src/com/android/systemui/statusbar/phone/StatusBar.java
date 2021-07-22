@@ -66,6 +66,7 @@ import android.app.admin.DevicePolicyManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentCallbacks2;
 import android.content.ComponentName;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -73,6 +74,7 @@ import android.content.pm.IPackageManager;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
+import android.database.ContentObserver;
 import android.graphics.Point;
 import android.graphics.PointF;
 import android.media.AudioAttributes;
@@ -156,6 +158,7 @@ import com.android.systemui.dagger.qualifiers.UiBackground;
 import com.android.systemui.fragments.ExtensionFragmentListener;
 import com.android.systemui.fragments.FragmentHostManager;
 import com.android.systemui.keyguard.DismissCallbackRegistry;
+import com.android.systemui.keyguard.KeyguardSliceProvider;
 import com.android.systemui.keyguard.KeyguardViewMediator;
 import com.android.systemui.keyguard.ScreenLifecycle;
 import com.android.systemui.keyguard.WakefulnessLifecycle;
@@ -211,7 +214,6 @@ import com.android.systemui.statusbar.notification.row.ExpandableNotificationRow
 import com.android.systemui.statusbar.notification.row.NotificationGutsManager;
 import com.android.systemui.statusbar.notification.stack.NotificationListContainer;
 import com.android.systemui.statusbar.phone.dagger.StatusBarComponent;
-import com.android.systemui.statusbar.phone.dagger.StatusBarPhoneModule;
 import com.android.systemui.statusbar.policy.BatteryController;
 import com.android.systemui.statusbar.policy.BrightnessMirrorController;
 import com.android.systemui.statusbar.policy.ConfigurationController;
@@ -527,6 +529,8 @@ public class StatusBar extends SystemUI implements DemoMode,
     private final NotificationRemoteInputManager mRemoteInputManager;
     private boolean mWallpaperSupported;
 
+    private VolumePluginManager mVolumePluginManager;
+
     private final BroadcastReceiver mWallpaperChangedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -650,7 +654,7 @@ public class StatusBar extends SystemUI implements DemoMode,
      * Public constructor for StatusBar.
      *
      * StatusBar is considered optional, and therefore can not be marked as @Inject directly.
-     * Instead, an @Provide method is included. See {@link StatusBarPhoneModule}.
+     * Instead, an @Provide method is included.
      */
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     public StatusBar(
@@ -859,6 +863,8 @@ public class StatusBar extends SystemUI implements DemoMode,
         mWallpaperSupported =
                 mContext.getSystemService(WallpaperManager.class).isWallpaperSupported();
 
+        mVolumePluginManager = new VolumePluginManager(mContext, mHandler);
+
         // Connect in to the status bar manager service
         mCommandQueue.addCallback(this);
 
@@ -891,6 +897,9 @@ public class StatusBar extends SystemUI implements DemoMode,
                 result.mNavbarColorManagedByIme);
         mAppFullscreen = result.mAppFullscreen;
         mAppImmersive = result.mAppImmersive;
+
+        mCustomSettingsObserver.observe();
+        mCustomSettingsObserver.update();
 
         // StatusBarManagerService has a back up of IME token and it's restored here.
         setImeWindowStatus(mDisplayId, result.mImeToken, result.mImeWindowVis,
@@ -1946,6 +1955,41 @@ public class StatusBar extends SystemUI implements DemoMode,
     @VisibleForTesting
     void setUserSetupForTest(boolean userSetup) {
         mUserSetup = userSetup;
+    }
+
+    private CustomSettingsObserver mCustomSettingsObserver = new CustomSettingsObserver(mHandler);
+    private class CustomSettingsObserver extends ContentObserver {
+
+        CustomSettingsObserver(Handler handler) {
+            super(handler);
+        }
+
+        void observe() {
+            ContentResolver resolver = mContext.getContentResolver();
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.PULSE_ON_NEW_TRACKS),
+                    false, this, UserHandle.USER_ALL);
+        }
+
+        @Override
+        public void onChange(boolean selfChange, Uri uri) {
+            if (uri.equals(Settings.System.getUriFor(
+                    Settings.System.PULSE_ON_NEW_TRACKS))) {
+                setPulseOnNewTracks();
+            }
+        }
+
+        public void update() {
+            setPulseOnNewTracks();
+        }
+    }
+
+    private void setPulseOnNewTracks() {
+        if (KeyguardSliceProvider.getAttachedInstance() != null) {
+            KeyguardSliceProvider.getAttachedInstance().setPulseOnNewTracks(Settings.System.getIntForUser(mContext.getContentResolver(),
+                    Settings.System.PULSE_ON_NEW_TRACKS, 1,
+                    UserHandle.USER_CURRENT) == 1);
+        }
     }
 
     /**

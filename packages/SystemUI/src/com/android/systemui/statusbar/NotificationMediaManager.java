@@ -41,10 +41,15 @@ import android.os.UserHandle;
 import android.provider.DeviceConfig;
 import android.provider.DeviceConfig.Properties;
 import android.service.notification.NotificationListenerService;
+import android.text.TextUtils;
 import android.util.ArraySet;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.database.ContentObserver;
+import android.content.ContentResolver;
+import android.os.Handler;
+import android.provider.Settings;
 
 import com.android.internal.config.sysui.SystemUiDeviceConfigFlags;
 import com.android.internal.statusbar.NotificationVisibility;
@@ -92,6 +97,9 @@ public class NotificationMediaManager implements Dumpable {
     private static final String TAG = "NotificationMediaManager";
     public static final boolean DEBUG_MEDIA = false;
 
+    //private static final String NOWPLAYING_SERVICE = "com.google.intelligence.sense";
+    private static final String NOWPLAYING_SERVICE = "com.google.android.as";
+
     private final StatusBarStateController mStatusBarStateController
             = Dependency.get(StatusBarStateController.class);
     private final SysuiColorExtractor mColorExtractor = Dependency.get(SysuiColorExtractor.class);
@@ -134,9 +142,42 @@ public class NotificationMediaManager implements Dumpable {
     private String mMediaNotificationKey;
     private MediaMetadata mMediaMetadata;
 
+    private String mNowPlayingNotificationKey;
+    private String mNowPlayingTrack;
+
     private BackDropView mBackdrop;
     private ImageView mBackdropFront;
     private ImageView mBackdropBack;
+
+    private boolean mLockscreenArt;
+
+    class SettingsObserver extends ContentObserver {
+        SettingsObserver(Handler handler) {
+            super(handler);
+        }
+
+        void observe() {
+            ContentResolver resolver = mContext.getContentResolver();
+            // Observe all users' changes
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.LOCKSCREEN_MEDIA_ART), false, this,
+                    UserHandle.USER_ALL);
+            updateSettings();
+        }
+
+        @Override 
+        public void onChange(boolean selfChange) {
+            updateSettings();
+        }
+    }
+
+    public void updateSettings() {
+        ContentResolver resolver = mContext.getContentResolver();
+        mLockscreenArt =  Settings.System.getIntForUser(resolver,
+                Settings.System.LOCKSCREEN_MEDIA_ART, 1,
+                UserHandle.USER_CURRENT) == 1;
+        
+    }
 
     private boolean mShowCompactMediaSeekbar;
     private final DeviceConfig.OnPropertiesChangedListener mPropertiesChangedListener =
@@ -277,6 +318,9 @@ public class NotificationMediaManager implements Dumpable {
         deviceConfig.addOnPropertiesChangedListener(DeviceConfig.NAMESPACE_SYSTEMUI,
                 mContext.getMainExecutor(),
                 mPropertiesChangedListener);
+        Handler mHandler = new Handler();
+        SettingsObserver settingsObserver = new SettingsObserver(mHandler);
+        settingsObserver.observe();
     }
 
     private void removeEntry(NotificationEntry entry) {
@@ -300,6 +344,10 @@ public class NotificationMediaManager implements Dumpable {
     public void onNotificationRemoved(String key) {
         if (key.equals(mMediaNotificationKey)) {
             clearCurrentMediaNotification();
+            dispatchUpdateMediaMetaData(true /* changed */, true /* allowEnterAnimation */);
+        }
+        if (key.equals(mNowPlayingNotificationKey)) {
+            mNowPlayingNotificationKey = null;
             dispatchUpdateMediaMetaData(true /* changed */, true /* allowEnterAnimation */);
         }
     }
@@ -350,6 +398,20 @@ public class NotificationMediaManager implements Dumpable {
             // Promote the media notification with a controller in 'playing' state, if any.
             NotificationEntry mediaNotification = null;
             MediaController controller = null;
+
+            for (NotificationEntry entry : allNotifications) {
+                if (entry.getSbn().getPackageName().toLowerCase().equals(NOWPLAYING_SERVICE)) {
+                    mNowPlayingNotificationKey = entry.getSbn().getKey();
+                    String notificationText = null;
+                    final String title = entry.getSbn().getNotification()
+                            .extras.getString(Notification.EXTRA_TITLE);
+                    if (!TextUtils.isEmpty(title)) {
+                        mNowPlayingTrack = title;
+                    }
+                    break;
+                }
+            }
+
             for (NotificationEntry entry : allNotifications) {
                 if (entry.isMediaNotification()) {
                     final MediaSession.Token token =
@@ -430,6 +492,13 @@ public class NotificationMediaManager implements Dumpable {
         }
 
         dispatchUpdateMediaMetaData(metaDataChanged, true /* allowEnterAnimation */);
+    }
+
+    public String getNowPlayingTrack() {
+        if (mNowPlayingNotificationKey == null) {
+            mNowPlayingTrack = null;
+        }
+        return mNowPlayingTrack;
     }
 
     public void clearCurrentMediaNotification() {
@@ -555,7 +624,7 @@ public class NotificationMediaManager implements Dumpable {
             }
             mProcessArtworkTasks.clear();
         }
-        if (artworkBitmap != null && !Utils.useQsMediaPlayer(mContext)) {
+        if (artworkBitmap != null && mLockscreenArt) {
             mProcessArtworkTasks.add(new ProcessArtworkTask(this, metaDataChanged,
                     allowEnterAnimation).execute(artworkBitmap));
         } else {
@@ -597,7 +666,9 @@ public class NotificationMediaManager implements Dumpable {
             mScrimController.setHasBackdrop(hasArtwork);
         }
 
-        if ((hasArtwork || DEBUG_MEDIA_FAKE_ARTWORK)
+        // show artwork only if the media is playing
+        if (PlaybackState.STATE_PLAYING == getMediaControllerPlaybackState(mMediaController)
+                && (hasArtwork || DEBUG_MEDIA_FAKE_ARTWORK)
                 && (mStatusBarStateController.getState() != StatusBarState.SHADE || allowWhenShade)
                 &&  mBiometricUnlockController != null && mBiometricUnlockController.getMode()
                         != BiometricUnlockController.MODE_WAKE_AND_UNLOCK_PULSING
