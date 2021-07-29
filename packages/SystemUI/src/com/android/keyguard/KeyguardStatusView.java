@@ -311,6 +311,7 @@ public class KeyguardStatusView extends GridLayout implements
             // If text style clock, align the textView to start else keep it center.
             if (mCustomClockSelection) {
             boolean mCustomClockSelectionType = currentClock == null ? false : currentClock.contains("Type");
+            boolean mCustomClockSelectionTwelve = currentClock == null ? false : currentClock.contains("Twelve");
 
             // If left aligned style clock, align the textView to start else keep it center.
             if (mCustomClockSelectionType) {
