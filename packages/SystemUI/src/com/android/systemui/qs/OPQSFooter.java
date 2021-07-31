@@ -147,8 +147,7 @@ public class OPQSFooter extends LinearLayout {
     private TouchAnimator createFooterAnimator() {
         TouchAnimator.Builder builder = new TouchAnimator.Builder()
                 .addFloat(mEdit, "alpha", 0, 0, 1)
-                .addFloat(mDataUsageView, "alpha", 0, 0, 1)
-                .build();
+                .addFloat(mDataUsageView, "alpha", 0, 0, 1);
 
         if (mIsLandscape) {
             builder = builder.addFloat(mSettingsButton, "alpha", 0, 0, 1)
@@ -177,16 +176,6 @@ public class OPQSFooter extends LinearLayout {
 
     public View getEditButton() {
         return mEdit;
-    }
-
-    public void setOrientation(boolean isLandscape) {
-        mIsLandscape = isLandscape;
-        if (mIsLandscape) {
-            mFooterActions.setVisibility(View.GONE);
-        } else {
-            mFooterActions.setVisibility(View.VISIBLE);
-        }
-
     }
 
     public View getFooterActions() {

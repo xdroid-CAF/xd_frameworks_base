@@ -558,8 +558,6 @@ public class QSPanel extends LinearLayout implements Tunable, Callback, Brightne
             switchTileLayout();
         }
 
-        if (mOPFooterView != null) mOPFooterView.setOrientation(mIsLandscape);
-
         if (mIsLandscape && mUsingMediaPlayer) {
             LinearLayout.LayoutParams layoutParams = (LayoutParams) mMediaHost.getHostView().getLayoutParams();
             layoutParams.topMargin = 0;
