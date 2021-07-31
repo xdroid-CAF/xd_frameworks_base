@@ -90,6 +90,11 @@ public class QuickQSPanel extends QSPanel {
     }
 
     @Override
+    protected void addViewsAboveTiles() {
+        // Nothing to add above the tiles
+    }
+
+    @Override
     protected TileLayout createRegularTileLayout() {
         return new QuickQSPanel.HeaderTileLayout(mContext, mUiEventLogger);
     }
@@ -176,8 +181,9 @@ public class QuickQSPanel extends QSPanel {
 
     @Override
     public void onTuningChanged(String key, String newValue) {
-        if (QS_SHOW_BRIGHTNESS.equals(key) && mBrightnessView != null) {
-            mBrightnessView.setVisibility(View.VISIBLE);
+        if (QS_SHOW_BRIGHTNESS.equals(key)) {
+            // No Brightness or Tooltip for you!
+            super.onTuningChanged(key, "0");
         }
     }
 
@@ -409,11 +415,5 @@ public class QuickQSPanel extends QSPanel {
                 }
             }
         }
-    }
-
-    @Override
-    public void setListening(boolean listening) {
-        super.setListening(listening);
-        setBrightnessListening(listening);
     }
 }
