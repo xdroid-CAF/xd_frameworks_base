@@ -26,15 +26,20 @@ import static com.android.systemui.statusbar.phone.BiometricUnlockController.MOD
 import static com.android.systemui.statusbar.phone.BiometricUnlockController.MODE_WAKE_AND_UNLOCK_PULSING;
 
 import android.content.ComponentCallbacks2;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.provider.Settings;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewRootImpl;
 import android.view.WindowManagerGlobal;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 
 import androidx.annotation.VisibleForTesting;
 
@@ -62,6 +67,8 @@ import com.android.systemui.statusbar.notification.ViewGroupFadeHelper;
 import com.android.systemui.statusbar.phone.KeyguardBouncer.BouncerExpansionCallback;
 import com.android.systemui.statusbar.policy.ConfigurationController;
 import com.android.systemui.statusbar.policy.KeyguardStateController;
+import com.android.systemui.tuner.TunerService;
+import com.android.systemui.R;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -313,6 +320,11 @@ public class StatusBarKeyguardViewManager implements RemoteInputController.Callb
         boolean lockVisible = (mBouncer.isShowing() || keyguardWithoutQs)
                 && !mBouncer.isAnimatingAway() && !mKeyguardStateController.isKeyguardFadingAway();
 
+        final ContentResolver resolver = mContext.getContentResolver();
+        String currentClock = Settings.Secure.getString(
+            resolver, Settings.Secure.LOCK_SCREEN_CUSTOM_CLOCK_FACE);
+        boolean mCustomClockSelectionType = currentClock == null ? false : currentClock.contains("Type");
+
         if (mLastLockVisible != lockVisible) {
             mLastLockVisible = lockVisible;
             if (lockVisible) {
@@ -332,6 +344,25 @@ public class StatusBarKeyguardViewManager implements RemoteInputController.Callb
                 CrossFadeHelper.fadeOut(mLockIconContainer, duration, delay, null /* runnable */);
             }
         }
+
+        FrameLayout.LayoutParams paramsContainer =
+            (FrameLayout.LayoutParams) mLockIconContainer.getLayoutParams();
+        LinearLayout.LayoutParams paramsIcon =
+            (LinearLayout.LayoutParams) mLockIconContainer.findViewById(R.id.lock_icon).getLayoutParams();
+
+        if (mCustomClockSelectionType) {
+            mLockIconContainer.setPaddingRelative((int) mContext.getResources()
+                    .getDimension(R.dimen.custom_clock_left_padding) + 8, 0, 0, 0);
+            paramsContainer.gravity = Gravity.TOP | Gravity.LEFT;
+            paramsIcon.gravity = Gravity.LEFT;
+        } else {
+            mLockIconContainer.setPaddingRelative(0, 0, 0, 0);
+            paramsContainer.gravity = Gravity.TOP | Gravity.CENTER_HORIZONTAL;
+            paramsIcon.gravity = Gravity.CENTER_HORIZONTAL;
+        }
+
+        mLockIconContainer.setLayoutParams(paramsContainer);
+        mLockIconContainer.findViewById(R.id.lock_icon).setLayoutParams(paramsIcon);
     }
 
     /**
