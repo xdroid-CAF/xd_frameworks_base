@@ -143,6 +143,7 @@ public class AndroidSDP3ClockController implements ClockPlugin {
     private float mDarkAmount = 0;
 
     private Typeface mSliceTypeface;
+    private Typeface mClockTypeface;
 
     /**
      * Create a DefaultClockController instance.
@@ -283,7 +284,7 @@ public class AndroidSDP3ClockController implements ClockPlugin {
             CharSequence title = mainTitle != null ? mainTitle.getText() : null;
             mTitle.setText(title);
             mTitle.setTextSize(mTitleTextSize);
-            if (mSliceTypeface != null) mTitle.setTypeface(mSliceTypeface);
+            if (mSliceTypeface != null) mTitle.setTypeface(mClockTypeface);
             if (header.getPrimaryAction() != null
                     && header.getPrimaryAction().getAction() != null) {
                 mClickActions.put(mTitle, header.getPrimaryAction().getAction());
@@ -310,7 +311,7 @@ public class AndroidSDP3ClockController implements ClockPlugin {
                 button.setGravity(Gravity.START);
             }
 
-            if (mSliceTypeface != null) button.setTypeface(mSliceTypeface);
+            if (mSliceTypeface != null) button.setTypeface(mClockTypeface);
 
             LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) button.getLayoutParams();
             layoutParams.height = LinearLayout.LayoutParams.WRAP_CONTENT;
@@ -377,6 +378,12 @@ public class AndroidSDP3ClockController implements ClockPlugin {
             final boolean isDateSlice = child.getTag().toString().equals(KeyguardSliceProvider.KEYGUARD_DATE_URI);
             child.setTextSize((isDateSlice ? mTitleTextSize : mSliceTextSize) + (8f * darkAmount));
         }
+        Typeface.Builder builder = new Typeface.Builder(mContext.getAssets(),"google_sans_clock.ttf");
+        builder.setFontVariationSettings("'wght' " + String.valueOf(Math.round(300 - (darkAmount * 200))));
+        mClockTypeface = builder.build();
+
+        mClock.setTypeface(mClockTypeface);
+        mTitle.setTypeface(mClockTypeface);
         mTitle.setTextSize(mTitleTextSize + (8f * darkAmount));
         mRow.setDarkAmount(darkAmount);
         mTitle.requestLayout();
