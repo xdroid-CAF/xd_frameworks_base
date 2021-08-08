@@ -320,12 +320,6 @@ public class StatusBarKeyguardViewManager implements RemoteInputController.Callb
         boolean lockVisible = (mBouncer.isShowing() || keyguardWithoutQs)
                 && !mBouncer.isAnimatingAway() && !mKeyguardStateController.isKeyguardFadingAway();
 
-        final ContentResolver resolver = mContext.getContentResolver();
-        String currentClock = Settings.Secure.getString(
-            resolver, Settings.Secure.LOCK_SCREEN_CUSTOM_CLOCK_FACE);
-        boolean mCustomClockSelectionType = currentClock == null ? false : currentClock.contains("Type");
-        boolean mCustomClockSelectionTwelve = currentClock == null ? false : currentClock.contains("Twelve");
-
         if (mLastLockVisible != lockVisible) {
             mLastLockVisible = lockVisible;
             if (lockVisible) {
@@ -346,29 +340,35 @@ public class StatusBarKeyguardViewManager implements RemoteInputController.Callb
             }
         }
 
+        if (!lockVisible)
+            return;
+
+        final ContentResolver resolver = mContext.getContentResolver();
+        String currentClock = Settings.Secure.getString(
+            resolver, Settings.Secure.LOCK_SCREEN_CUSTOM_CLOCK_FACE);
+        boolean mCustomClockSelectionType = currentClock == null ? false : currentClock.contains("Type");
+        boolean mCustomClockSelectionTwelve = currentClock == null ? false : currentClock.contains("Twelve");
+
         FrameLayout.LayoutParams paramsContainer =
             (FrameLayout.LayoutParams) mLockIconContainer.getLayoutParams();
-        LinearLayout.LayoutParams paramsIcon =
-            (LinearLayout.LayoutParams) mLockIconContainer.findViewById(R.id.lock_icon).getLayoutParams();
 
-        if (mCustomClockSelectionType) {
+        if (mBouncer.isShowing()) {
+            mLockIconContainer.setPaddingRelative(0, 0, 0, 0);
+            paramsContainer.gravity = Gravity.TOP | Gravity.CENTER_HORIZONTAL;
+        } else if (mCustomClockSelectionType) {
             mLockIconContainer.setPaddingRelative((int) mContext.getResources()
                     .getDimension(R.dimen.custom_clock_left_padding) + 8, 0, 0, 0);
             paramsContainer.gravity = Gravity.TOP | Gravity.LEFT;
-            paramsIcon.gravity = Gravity.LEFT;
         } else if (mCustomClockSelectionTwelve) {
             mLockIconContainer.setPaddingRelative((int) mContext.getResources()
                     .getDimension(R.dimen.ssos_clock_left_padding) + 8, 0, 0, 0);
             paramsContainer.gravity = Gravity.TOP | Gravity.LEFT;
-            paramsIcon.gravity = Gravity.LEFT;
         } else {
             mLockIconContainer.setPaddingRelative(0, 0, 0, 0);
             paramsContainer.gravity = Gravity.TOP | Gravity.CENTER_HORIZONTAL;
-            paramsIcon.gravity = Gravity.CENTER_HORIZONTAL;
         }
 
         mLockIconContainer.setLayoutParams(paramsContainer);
-        mLockIconContainer.findViewById(R.id.lock_icon).setLayoutParams(paramsIcon);
     }
 
     /**
