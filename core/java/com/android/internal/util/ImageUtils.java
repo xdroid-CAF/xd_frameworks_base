@@ -37,6 +37,8 @@ import android.util.Size;
 
 import java.io.IOException;
 
+import com.android.internal.util.xdroid.Converter;
+
 /**
  * Utility class for image analysis and processing.
  *
