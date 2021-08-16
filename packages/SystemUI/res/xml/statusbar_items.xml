@@ -13,10 +13,10 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
+
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:sysui="http://schemas.android.com/apk/res-auto"
-    android:key="status_bar"
-    android:title="@string/status_bar">
+    android:title="@string/statusbar_items_title">
 
     <com.android.systemui.tuner.StatusBarSwitch
         android:key="rotate"
@@ -61,6 +61,10 @@
     <com.android.systemui.tuner.StatusBarSwitch
         android:key="mobile"
         android:title="@string/quick_settings_cellular_detail_title" />
+
+    <com.android.systemui.tuner.StatusBarSwitch
+        android:key="network_activity"
+        android:title="@string/status_bar_network_activity" />
 
     <com.android.systemui.tuner.StatusBarSwitch
         android:key="airplane"

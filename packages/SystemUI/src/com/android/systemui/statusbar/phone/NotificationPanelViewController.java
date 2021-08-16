@@ -419,6 +419,7 @@ public class NotificationPanelViewController extends PanelViewController {
     private final ShadeController mShadeController;
     private int mDisplayId;
 
+    private int mStatusBarHeaderHeight;
     private GestureDetector mDoubleTapGestureListener;
 
     /**
@@ -665,6 +666,8 @@ public class NotificationPanelViewController extends PanelViewController {
                 com.android.internal.R.dimen.status_bar_height);
         mHeadsUpInset = statusbarHeight + mResources.getDimensionPixelSize(
                 R.dimen.heads_up_status_bar_padding);
+        mStatusBarHeaderHeight = mResources.getDimensionPixelSize(
+                R.dimen.status_bar_height);
     }
 
     /**
@@ -835,7 +838,7 @@ public class NotificationPanelViewController extends PanelViewController {
         } else {
             int totalHeight = mView.getHeight();
             int bottomPadding = Math.max(mIndicationBottomPadding, mAmbientIndicationBottomPadding);
-            int clockPreferredY = mKeyguardStatusView.getClockPreferredY(totalHeight);
+            int clockPreferredY = (int) mKeyguardStatusView.getClockPreferredY(totalHeight);
             boolean bypassEnabled = mKeyguardBypassController.getBypassEnabled();
             final boolean
                     hasVisibleNotifications =
@@ -3187,6 +3190,11 @@ public class NotificationPanelViewController extends PanelViewController {
                 if (mStatusBar.isBouncerShowingScrimmed()) {
                     return false;
                 }
+                if (!mQsExpanded
+                        && mDoubleTapToSleepEnabled
+                        && event.getY() < mStatusBarHeaderHeight) {
+                    mDoubleTapGestureListener.onTouchEvent(event);
+                }
 
                 if (mBarState == StatusBarState.KEYGUARD) {
                     mDoubleTapGestureListener.onTouchEvent(event);
@@ -3792,5 +3800,9 @@ public class NotificationPanelViewController extends PanelViewController {
             updateMaxHeadsUpTranslation();
             return insets;
         }
+    }
+
+    public void updateDoubleTapToSleep(boolean doubleTapToSleepEnabled) {
+        mDoubleTapToSleepEnabled = doubleTapToSleepEnabled;
     }
 }

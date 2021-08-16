@@ -4814,6 +4814,18 @@ public final class Settings {
         public static final String STATUS_BAR_SHOW_BATTERY_PERCENT = "status_bar_show_battery_percent";
 
         /**
+         *  Enable statusbar double tap gesture on to put device to sleep
+         * @hide
+         */
+        public static final String DOUBLE_TAP_SLEEP_GESTURE = "double_tap_sleep_gesture";
+
+        /**
+         * media artwork wallpaper blur level on lockscreen
+         * @hide
+         */
+        public static final String LOCKSCREEN_MEDIA_BLUR = "lockscreen_media_blur";
+
+        /**
          * Whether or not volume button music controls should be enabled to seek media tracks
          * @hide
          */
@@ -4915,11 +4927,39 @@ public final class Settings {
          */
         public static final String THREE_FINGER_GESTURE = "three_finger_gesture";
 
-        /*
-         * Lockscreen Media Art
+        /**
+         * Enable and disable Artwork on background media notification
          * @hide
          */
-        public static final String LOCKSCREEN_MEDIA_ART = "lockscreen_media_art";
+        public static final String ARTWORK_MEDIA_BACKGROUND = "artwork_media_background";
+
+        /**
+         * The fade level of Artwork on background media notification
+         * requires ARTWORK_MEDIA_BACKGROUND to be enabled
+         * @hide
+         */
+        public static final String ARTWORK_MEDIA_FADE_LEVEL = "artwork_media_fade_level";
+
+        /**
+         * Whether to show the battery info on the lockscreen while charging
+         * @hide
+         */
+        public static final String LOCKSCREEN_BATTERY_INFO = "lockscreen_battery_info";
+
+        /**
+         * Whether to show artist and title on ambient/lock screen on new music tracks
+         * 0 - don't show track info
+         * 1 - show track info on bottom of Ambient Display (Pixel style)
+         * 2 - show track info within cLock widget (AOSP style)
+         * @hide
+         */
+        public static final String AMBIENT_MUSIC_TICKER = "ambient_music_ticker";
+        
+        /**
+         * Whether to show lock icon on lockscreen
+         * @hide
+         */
+        public static final String LOCKSCREEN_LOCK_ICON = "lockscreen_lock_icon";
 
         /**
          * These are all public system settings
@@ -5037,7 +5077,7 @@ public final class Settings {
             PRIVATE_SETTINGS.add(STATUSBAR_CLOCK_DATE_FORMAT);
             PRIVATE_SETTINGS.add(STATUSBAR_CLOCK_DATE_POSITION);
             PRIVATE_SETTINGS.add(SYSTEMUI_PLUGIN_VOLUME);
-            PRIVATE_SETTINGS.add(LOCKSCREEN_MEDIA_ART);
+            PRIVATE_SETTINGS.add(DOUBLE_TAP_SLEEP_GESTURE);
         }
 
         /**
@@ -9046,6 +9086,12 @@ public final class Settings {
                 "back_gesture_inset_scale_right";
 
         /**
+         * Position of gesture bar length slider.
+         * @hide
+         */
+        public static final String GESTURE_NAVBAR_LENGTH = "gesture_navbar_length";
+
+        /**
          * Current provider of proximity-based sharing services.
          * Default value in @string/config_defaultNearbySharingComponent.
          * No VALIDATOR as this setting will not be backed up.
@@ -9293,6 +9339,13 @@ public final class Settings {
         public static void setLocationProviderEnabled(ContentResolver cr,
                 String provider, boolean enabled) {
         }
+
+        /** Whether to show lockscreen media art
+         *
+         * @hide
+         */
+        public static final String LOCKSCREEN_MEDIA_METADATA = "lockscreen_media_metadata";
+        
     }
 
     /**

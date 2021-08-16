@@ -222,11 +222,17 @@ public class KeyguardSliceProvider extends SliceProvider implements
     protected boolean needsMediaLocked() {
         boolean keepWhenAwake = mKeyguardBypassController != null
                 && mKeyguardBypassController.getBypassEnabled() && mDozeParameters.getAlwaysOn();
+        String currentClock = Settings.Secure.getString(
+                mContentResolver, Settings.Secure.LOCK_SCREEN_CUSTOM_CLOCK_FACE);
+        boolean isTypeClockSelected = currentClock == null ? false : currentClock.contains("Type");
+        boolean isShapeShiftTwelveClockSelected = currentClock == null ? false : currentClock.contains("Twelve");
+        boolean isCenterMusicTickerEnabled = Settings.System.getIntForUser(getContext().getContentResolver(),
+                Settings.System.AMBIENT_MUSIC_TICKER, 1, UserHandle.USER_CURRENT) == 2;
         // Show header if music is playing and the status bar is in the shade state. This way, an
         // animation isn't necessary when pressing power and transitioning to AOD.
         boolean keepWhenShade = mStatusBarState == StatusBarState.SHADE && mMediaIsVisible;
         return !TextUtils.isEmpty(mMediaTitle) && mMediaIsVisible && (mDozing || keepWhenAwake
-                || keepWhenShade);
+                || keepWhenShade) && isCenterMusicTickerEnabled && !isTypeClockSelected;
     }
 
     protected void addMediaLocked(ListBuilder listBuilder) {
@@ -279,16 +285,38 @@ public class KeyguardSliceProvider extends SliceProvider implements
      * @param builder The slice builder.
      */
     protected void addZenModeLocked(ListBuilder builder) {
+        String currentClock = Settings.Secure.getString(
+                mContentResolver, Settings.Secure.LOCK_SCREEN_CUSTOM_CLOCK_FACE);
+        boolean isShapeShiftTwelveClockSelected = currentClock == null ? false : currentClock.contains("Twelve");
         if (!isDndOn()) {
             return;
         }
-        RowBuilder dndBuilder = new RowBuilder(mDndUri)
-                .setContentDescription(getContext().getResources()
-                        .getString(R.string.accessibility_quick_settings_dnd))
-                .addEndItem(
-                    IconCompat.createWithResource(getContext(), R.drawable.stat_sys_dnd),
-                    ListBuilder.ICON_IMAGE);
-        builder.addRow(dndBuilder);
+
+        IconCompat noOOS12 = IconCompat.createWithResource(getContext(), com.android.internal.R.drawable.ic_qs_dnd);
+        IconCompat OOS12 = IconCompat.createWithResource(getContext(), R.drawable.ic_no_disturb_ssos);
+        String dndString = getContext().getResources().getString(R.string.accessibility_quick_settings_dnd);
+        String dndStringTitle = getContext().getResources().getString(R.string.quick_settings_dnd_label);
+
+        if (isShapeShiftTwelveClockSelected) {
+            if (!com.android.internal.util.xdroid.Utils.isThemeEnabled("com.android.theme.icon_pack.oos.systemui")) {
+                RowBuilder dndBuilder = new RowBuilder(mDndUri)
+                        .setTitle(dndStringTitle)
+                        .setContentDescription(dndString)
+                        .addEndItem(noOOS12, ListBuilder.ICON_IMAGE);
+                builder.addRow(dndBuilder);
+            } else {
+                RowBuilder dndBuilder = new RowBuilder(mDndUri)
+                        .setTitle(dndStringTitle)
+                        .setContentDescription(dndString)
+                        .addEndItem(OOS12, ListBuilder.ICON_IMAGE);
+                builder.addRow(dndBuilder);
+            }
+        } else {
+            RowBuilder dndBuilder = new RowBuilder(mDndUri)
+                    .setContentDescription(dndString)
+                    .addEndItem(IconCompat.createWithResource(getContext(), R.drawable.stat_sys_dnd), ListBuilder.ICON_IMAGE);
+            builder.addRow(dndBuilder);
+        }
     }
 
     /**

@@ -16,6 +16,7 @@
 
 package com.android.systemui.statusbar.phone;
 
+import android.content.Context;
 import android.content.res.Resources;
 import android.hardware.display.AmbientDisplayConfiguration;
 import android.os.PowerManager;
@@ -46,6 +47,7 @@ public class DozeParameters implements TunerService.Tunable,
             SystemProperties.getBoolean("debug.force_no_blanking", false);
     public static final boolean FORCE_BLANKING =
             SystemProperties.getBoolean("debug.force_blanking", false);
+    private static DozeParameters sInstance;
 
     private final AmbientDisplayConfiguration mAmbientDisplayConfiguration;
     private final PowerManager mPowerManager;
@@ -70,6 +72,8 @@ public class DozeParameters implements TunerService.Tunable,
         mControlScreenOffAnimation = !getDisplayNeedsBlanking();
         mPowerManager = powerManager;
         mPowerManager.setDozeAfterScreenOff(!mControlScreenOffAnimation);
+        
+        sInstance = this;
 
         tunerService.addTunable(
                 this,
@@ -89,6 +93,10 @@ public class DozeParameters implements TunerService.Tunable,
         pw.print("    getVibrateOnPickup(): "); pw.println(getVibrateOnPickup());
         pw.print("    getProxCheckBeforePulse(): "); pw.println(getProxCheckBeforePulse());
         pw.print("    getPickupVibrationThreshold(): "); pw.println(getPickupVibrationThreshold());
+    }
+
+    public static DozeParameters getInstance(Context context) {
+        return sInstance;
     }
 
     public boolean getDisplayStateSupported() {
