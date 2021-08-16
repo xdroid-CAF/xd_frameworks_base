@@ -50,7 +50,7 @@ import android.widget.TextView;
 
 import com.android.internal.colorextraction.ColorExtractor;
 import com.android.internal.graphics.ColorUtils;
-import com.android.internal.util.Converter;
+import com.android.internal.util.xdroid.Converter;
 import com.android.settingslib.Utils;
 import com.android.systemui.Dependency;
 import com.android.systemui.R;
