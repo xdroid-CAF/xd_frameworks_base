@@ -52,6 +52,8 @@ LOCAL_REQUIRED_MODULES := \
     IconPackSamSystemUIOverlay \
     IconPackSamThemePickerOverlay \
     IconPackOOSAndroidOverlay \
+    IconPackOOSLauncherOverlay \
+    IconPackOOSSettingsOverlay \
     IconPackOOSSystemUIOverlay \
     IconPackKaiAndroidOverlay \
     IconPackKaiLauncherOverlay \
