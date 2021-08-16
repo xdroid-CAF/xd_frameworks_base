@@ -21,10 +21,8 @@ import static android.provider.Settings.ACTION_MEDIA_CONTROLS_SETTINGS;
 
 import android.app.PendingIntent;
 import android.content.Context;
-import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.res.ColorStateList;
-import android.graphics.Color;
 import android.graphics.Outline;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
@@ -33,7 +31,6 @@ import android.graphics.drawable.Icon;
 import android.media.session.MediaController;
 import android.media.session.MediaSession;
 import android.media.session.PlaybackState;
-import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewOutlineProvider;
@@ -46,13 +43,13 @@ import androidx.annotation.Nullable;
 import androidx.annotation.UiThread;
 import androidx.constraintlayout.widget.ConstraintSet;
 
+import com.android.internal.graphics.ColorUtils;
 import com.android.settingslib.Utils;
 import com.android.settingslib.widget.AdaptiveIcon;
 import com.android.systemui.R;
 import com.android.systemui.dagger.qualifiers.Background;
 import com.android.systemui.media.dialog.MediaOutputDialogFactory;
 import com.android.systemui.plugins.ActivityStarter;
-import com.android.systemui.statusbar.MediaArtworkProcessor;
 import com.android.systemui.statusbar.phone.KeyguardDismissUtil;
 import com.android.systemui.util.animation.TransitionLayout;
 
@@ -100,7 +97,8 @@ public class MediaControlPanel {
     // This will provide the corners for the album art.
     private final ViewOutlineProvider mViewOutlineProvider;
     private final MediaOutputDialogFactory mMediaOutputDialogFactory;
-    private final MediaArtworkProcessor mMediaArtworkProcessor;
+    private boolean mBackgroundArtwork = false;
+    private int mArtworkFadeLevel = 30;
 
     /**
      * Initialize a new control panel
@@ -113,7 +111,7 @@ public class MediaControlPanel {
             ActivityStarter activityStarter, MediaViewController mediaViewController,
             SeekBarViewModel seekBarViewModel, Lazy<MediaDataManager> lazyMediaDataManager,
             KeyguardDismissUtil keyguardDismissUtil, MediaOutputDialogFactory
-            mediaOutputDialogFactory, MediaArtworkProcessor mediaArtworkProcessor) {
+            mediaOutputDialogFactory) {
         mContext = context;
         mBackgroundExecutor = backgroundExecutor;
         mActivityStarter = activityStarter;
@@ -122,7 +120,6 @@ public class MediaControlPanel {
         mMediaDataManagerLazy = lazyMediaDataManager;
         mKeyguardDismissUtil = keyguardDismissUtil;
         mMediaOutputDialogFactory = mediaOutputDialogFactory;
-        mMediaArtworkProcessor = mediaArtworkProcessor;
         loadDimens();
 
         mViewOutlineProvider = new ViewOutlineProvider() {
@@ -175,6 +172,11 @@ public class MediaControlPanel {
      */
     public void setListening(boolean listening) {
         mSeekBarViewModel.setListening(listening);
+    }
+
+    public void updateBgArtworkParams(boolean backgroundArtwork, int fadeLevel) {
+        mBackgroundArtwork = backgroundArtwork;
+        mArtworkFadeLevel = fadeLevel;
     }
 
     /**
@@ -238,8 +240,6 @@ public class MediaControlPanel {
         ConstraintSet expandedSet = mMediaViewController.getExpandedLayout();
         ConstraintSet collapsedSet = mMediaViewController.getCollapsedLayout();
 
-        boolean backgroundArtwork = Settings.System.getInt(mContext.getContentResolver(),
-                Settings.System.ARTWORK_MEDIA_BACKGROUND, 0) == 1;
         ImageView backgroundImage = mViewHolder.getPlayer().findViewById(R.id.bg_album_art);
 
         mViewHolder.getPlayer().setBackgroundTintList(
@@ -260,16 +260,11 @@ public class MediaControlPanel {
         if (hasArtwork) {
             albumView.setImageDrawable(scaleDrawable(artwork));
         }
-        setVisibleAndAlpha(collapsedSet, R.id.album_art, hasArtwork && !backgroundArtwork);
-        setVisibleAndAlpha(expandedSet, R.id.album_art, hasArtwork && !backgroundArtwork);
+        setVisibleAndAlpha(collapsedSet, R.id.album_art, hasArtwork && !mBackgroundArtwork);
+        setVisibleAndAlpha(expandedSet, R.id.album_art, hasArtwork && !mBackgroundArtwork);
 
         if (hasArtwork) {
-            BitmapDrawable ong = (BitmapDrawable) artwork.loadDrawable(mContext);
-            ong = new BitmapDrawable(mContext.getResources(),
-                    mMediaArtworkProcessor.processArtwork(mContext,
-                        ong.getBitmap(), 17f));
-            ong.setColorFilter(Color.rgb(170, 170, 170), android.graphics.PorterDuff.Mode.DARKEN);
-            backgroundImage.setImageDrawable(ong);
+            backgroundImage.setImageDrawable(artwork.loadDrawable(mContext));
             backgroundImage.setClipToOutline(true);
             backgroundImage.setOutlineProvider(new ViewOutlineProvider() {
                 @Override
@@ -278,9 +273,14 @@ public class MediaControlPanel {
                         backgroundImage.getHeight(), mAlbumArtRadius);
                 }
             });
+            if (mBackgroundArtwork) {
+                int extraTint = ColorUtils.setAlphaComponent(mBackgroundColor, mArtworkFadeLevel * 255 / 100);
+                extraTint = ColorUtils.blendARGB(extraTint, android.graphics.Color.BLACK, Math.min(mArtworkFadeLevel / 100f, 0.5f));
+                backgroundImage.setColorFilter(extraTint, android.graphics.PorterDuff.Mode.SRC_ATOP);
+            }
         }
-        setVisibleAndAlpha(collapsedSet, R.id.bg_album_art, backgroundArtwork);
-        setVisibleAndAlpha(expandedSet, R.id.bg_album_art, backgroundArtwork);
+        setVisibleAndAlpha(collapsedSet, R.id.bg_album_art, mBackgroundArtwork);
+        setVisibleAndAlpha(expandedSet, R.id.bg_album_art, mBackgroundArtwork);
 
         // App icon
         ImageView appIcon = mViewHolder.getAppIcon();
