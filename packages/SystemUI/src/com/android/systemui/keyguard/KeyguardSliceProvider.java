@@ -231,8 +231,8 @@ public class KeyguardSliceProvider extends SliceProvider implements
         // Show header if music is playing and the status bar is in the shade state. This way, an
         // animation isn't necessary when pressing power and transitioning to AOD.
         boolean keepWhenShade = mStatusBarState == StatusBarState.SHADE && mMediaIsVisible;
-        return !TextUtils.isEmpty(mMediaTitle) && (mMediaIsVisible || isShapeShiftTwelveClockSelected) && (mDozing || keepWhenAwake
-                || keepWhenShade || isShapeShiftTwelveClockSelected) && (isCenterMusicTickerEnabled || isShapeShiftTwelveClockSelected) && !isTypeClockSelected;
+        return !TextUtils.isEmpty(mMediaTitle) && mMediaIsVisible && (mDozing || keepWhenAwake
+                || keepWhenShade) && isCenterMusicTickerEnabled && !isTypeClockSelected;
     }
 
     protected void addMediaLocked(ListBuilder listBuilder) {
@@ -506,9 +506,6 @@ public class KeyguardSliceProvider extends SliceProvider implements
     }
 
     private void updateMediaStateLocked(MediaMetadata metadata, @PlaybackState.State int state) {
-        String currentClock = Settings.Secure.getString(
-                mContentResolver, Settings.Secure.LOCK_SCREEN_CUSTOM_CLOCK_FACE);
-        boolean isShapeShiftTwelveClockSelected = currentClock == null ? false : currentClock.contains("Twelve");
         boolean nextVisible = NotificationMediaManager.isPlayingState(state);
         // Get track info from Now Playing notification, if available, and only if there's no playing media notification
         CharSequence npTitle = mMediaManager.getNowPlayingTrack();
@@ -537,13 +534,7 @@ public class KeyguardSliceProvider extends SliceProvider implements
         }
 
         // Set new track info from playing media notification
-        if (isShapeShiftTwelveClockSelected && title != null) {
-            StringBuffer evenSB = new StringBuffer(" ");
-            evenSB.append(title);
-            mMediaTitle = evenSB;
-        } else {
-            mMediaTitle = title;
-        }
+        mMediaTitle = title;
         mMediaArtist = nowPlayingAvailable ? null : artist;
         mMediaIsVisible = nextVisible || nowPlayingAvailable;
 
