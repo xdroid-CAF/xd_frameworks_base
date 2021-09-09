@@ -28,7 +28,7 @@
         android:id="@+id/keyguard_indication_area"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/keyguard_indication_margin_bottom"
+        android:layout_marginBottom="@dimen/xd_keyguard_bottomarea_margin_bottom"
         android:layout_gravity="bottom|center_horizontal"
         android:orientation="vertical">
 
@@ -37,8 +37,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:paddingStart="@dimen/keyguard_indication_text_padding"
-            android:paddingEnd="@dimen/keyguard_indication_text_padding"
+            android:paddingStart="@dimen/xd_keyguard_bottomarea_padding_text"
+            android:paddingEnd="@dimen/xd_keyguard_bottomarea_padding_text"
             android:textAppearance="@style/TextAppearance.Keyguard.BottomArea"
             android:accessibilityLiveRegion="polite"/>
 
@@ -47,8 +47,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:paddingStart="@dimen/keyguard_indication_text_padding"
-            android:paddingEnd="@dimen/keyguard_indication_text_padding"
+            android:paddingStart="@dimen/xd_keyguard_bottomarea_padding_text"
+            android:paddingEnd="@dimen/xd_keyguard_bottomarea_padding_text"
             android:textAppearance="@style/TextAppearance.Keyguard.BottomArea"
             android:alpha=".54"
             android:visibility="gone"/>
@@ -63,29 +63,29 @@
 
     <com.android.systemui.statusbar.KeyguardAffordanceView
         android:id="@+id/camera_button"
-        android:layout_height="@dimen/keyguard_affordance_height"
-        android:layout_width="@dimen/keyguard_affordance_width"
+        android:layout_height="@dimen/xd_keyguard_affordance_height"
+        android:layout_width="@dimen/xd_keyguard_affordance_width"
         android:layout_gravity="bottom|end"
-        android:padding="@dimen/keyguard_affordance_padding"
-        android:layout_margin="@dimen/keyguard_affordance_margin"
-        android:background="@drawable/keyguard_affordance_background"
+        android:padding="@dimen/xd_keyguard_affordance_padding"
+        android:layout_margin="@dimen/xd_keyguard_affordance_margin"
+        android:background="@drawable/xd_lockscreen_shortcut_bg"
         android:src="@drawable/ic_camera_alt_24dp"
         android:scaleType="center"
         android:contentDescription="@string/accessibility_camera_button"
-        android:tint="@android:color/white" />
+        android:tint="@color/xd_lockscreen_shortcut_icon_color" />
 
     <com.android.systemui.statusbar.KeyguardAffordanceView
         android:id="@+id/left_button"
-        android:layout_height="@dimen/keyguard_affordance_height"
-        android:layout_width="@dimen/keyguard_affordance_width"
+        android:layout_height="@dimen/xd_keyguard_affordance_height"
+        android:layout_width="@dimen/xd_keyguard_affordance_width"
         android:layout_gravity="bottom|start"
-        android:padding="@dimen/keyguard_affordance_padding"
-        android:layout_margin="@dimen/keyguard_affordance_margin"
-        android:background="@drawable/keyguard_affordance_background"
+        android:padding="@dimen/xd_keyguard_affordance_padding"
+        android:layout_margin="@dimen/xd_keyguard_affordance_margin"
+        android:background="@drawable/xd_lockscreen_shortcut_bg"
         android:src="@*android:drawable/ic_phone"
         android:scaleType="center"
         android:contentDescription="@string/accessibility_phone_button"
-        android:tint="@android:color/white" />
+        android:tint="@color/xd_lockscreen_shortcut_icon_color" />
 
     <FrameLayout
         android:id="@+id/overlay_container"

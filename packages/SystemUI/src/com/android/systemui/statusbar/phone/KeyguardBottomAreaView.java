@@ -243,7 +243,7 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
                 R.id.keyguard_indication_enterprise_disclosure);
         mIndicationText = findViewById(R.id.keyguard_indication_text);
         mIndicationBottomMargin = getResources().getDimensionPixelSize(
-                R.dimen.keyguard_indication_margin_bottom);
+                R.dimen.xd_keyguard_bottomarea_margin_bottom);
         mBurnInYOffset = getResources().getDimensionPixelSize(
                 R.dimen.default_burn_in_prevention_offset);
         updateCameraVisibility();
@@ -308,7 +308,7 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
     protected void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         mIndicationBottomMargin = getResources().getDimensionPixelSize(
-                R.dimen.keyguard_indication_margin_bottom);
+                R.dimen.xd_keyguard_bottomarea_margin_bottom);
         mBurnInYOffset = getResources().getDimensionPixelSize(
                 R.dimen.default_burn_in_prevention_offset);
         MarginLayoutParams mlp = (MarginLayoutParams) mIndicationArea.getLayoutParams();
@@ -326,14 +326,14 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
                         com.android.internal.R.dimen.text_size_small_material));
 
         ViewGroup.LayoutParams lp = mRightAffordanceView.getLayoutParams();
-        lp.width = getResources().getDimensionPixelSize(R.dimen.keyguard_affordance_width);
-        lp.height = getResources().getDimensionPixelSize(R.dimen.keyguard_affordance_height);
+        lp.width = getResources().getDimensionPixelSize(R.dimen.xd_keyguard_affordance_width);
+        lp.height = getResources().getDimensionPixelSize(R.dimen.xd_keyguard_affordance_height);
         mRightAffordanceView.setLayoutParams(lp);
         updateRightAffordanceIcon();
 
         lp = mLeftAffordanceView.getLayoutParams();
-        lp.width = getResources().getDimensionPixelSize(R.dimen.keyguard_affordance_width);
-        lp.height = getResources().getDimensionPixelSize(R.dimen.keyguard_affordance_height);
+        lp.width = getResources().getDimensionPixelSize(R.dimen.xd_keyguard_affordance_width);
+        lp.height = getResources().getDimensionPixelSize(R.dimen.xd_keyguard_affordance_height);
         mLeftAffordanceView.setLayoutParams(lp);
         updateLeftAffordanceIcon();
     }

@@ -19,4 +19,8 @@
     <!-- QS Drag handle -->
     <color name="xd_qs_footer_drag_handle">#ffc8c8c8</color>
 
+    <!-- Keyguard -->
+    <color name="xd_lockscreen_shortcut_bg_color">#FFFFFF</color>
+    <color name="xd_lockscreen_shortcut_icon_color">#000000</color>
+
 </resources>
