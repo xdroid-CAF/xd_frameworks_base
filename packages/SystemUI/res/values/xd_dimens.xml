@@ -46,13 +46,4 @@
     <dimen name="brightness_slider_height">48dp</dimen>
     <dimen name="pa_qs_footer_action_button_size">48dp</dimen>
 
-    <!-- Keyguard -->
-    <dimen name="xd_keyguard_bottomarea_padding_text">88dp</dimen>
-    <dimen name="xd_keyguard_bottomarea_margin_bottom">35dp</dimen>
-    <dimen name="xd_keyguard_affordance_margin">24dp</dimen>
-    <dimen name="xd_keyguard_bottomarea_text_size">13sp</dimen>
-    <dimen name="xd_keyguard_affordance_height">56dp</dimen>
-    <dimen name="xd_keyguard_affordance_width">56dp</dimen>
-    <dimen name="xd_keyguard_affordance_padding">10dp</dimen>
-
 </resources>
