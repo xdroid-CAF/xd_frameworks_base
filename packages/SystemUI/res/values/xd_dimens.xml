@@ -46,4 +46,7 @@
     <dimen name="brightness_slider_height">48dp</dimen>
     <dimen name="pa_qs_footer_action_button_size">48dp</dimen>
 
+    <!-- App Lock -->
+    <dimen name="applock_icon_dimension">54dp</dimen>
+
 </resources>
