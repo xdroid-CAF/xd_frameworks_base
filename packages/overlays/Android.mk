@@ -30,6 +30,56 @@ LOCAL_REQUIRED_MODULES := \
 	AccentColorAmethystOverlay \
 	AccentColorAquamarineOverlay \
 	AccentColorTangerineOverlay \
+	AccentColorBlueGrayOverlay \
+	AccentColorCyanOverlay \
+	AccentColorDorsetGoldOverlay \
+	AccentColorFlatPinkOverlay \
+	AccentColorIndigoOverlay \
+	AccentColorInfernoRedOverlay \
+	AccentColorLightPurpleOverlay \
+	AccentColorMetallicGoldOverlay \
+	AccentColorMidnightPurpleOverlay \
+	AccentColorPinkOverlay \
+	AccentColorRedOverlay \
+	AccentColorTealOverlay \
+	AccentColorCocaColaOverlay \
+	AccentColorCoralOverlay \
+	AccentColorDiscordOverlay \
+	AccentColorEvolutionBlueOverlay \
+	AccentColorEvolutionGreenOverlay \
+	AccentColorEvolutionRedOverlay \
+	AccentColorEvolutionYellowOverlay \
+	AccentColorFerrariRedOverlay \
+	AccentColorGoldenShowerOverlay \
+	AccentColorJollibeeOverlay \
+	AccentColorMatrixOverlay \
+	AccentColorNextbitOverlay \
+	AccentColorOnePlusOverlay \
+	AccentColorOrangeOverlay \
+	AccentColorParanoidOverlay \
+	AccentColorPepsiOverlay \
+	AccentColorPixelBlueOGOverlay \
+	AccentColorRazerOverlay \
+	AccentColorSalmonOverlay \
+	AccentColorStarbucksOverlay \
+	AccentColorUbuntuOverlay \
+	AccentColorXboxOverlay \
+	AccentColorXiaomiOverlay \
+	AccentColorPixelBlueOverlay \
+	AccentColorGoogleBlueOverlay \
+	AccentColorGoogleRedOverlay \
+	AccentColorGoogleYellowOverlay \
+	AccentColorGoogleGreenOverlay \
+	AccentColorGoogleGrayOverlay \
+	AccentColorAppleBlueOverlay \
+	AccentColorAppleGreenOverlay \
+	AccentColorAppleIndigoOverlay \
+	AccentColorAppleOrangeOverlay \
+	AccentColorApplePinkOverlay \
+	AccentColorApplePurpleOverlay \
+	AccentColorAppleRedOverlay \
+	AccentColorAppleTealOverlay \
+	AccentColorAppleYellowOverlay \
 	DisplayCutoutEmulationCornerOverlay \
 	DisplayCutoutEmulationDoubleOverlay \
     DisplayCutoutEmulationHoleOverlay \

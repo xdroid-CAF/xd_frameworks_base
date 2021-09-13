@@ -101,6 +101,8 @@ import com.android.systemui.statusbar.phone.StatusBar;
 import com.android.systemui.util.DeviceConfigProxy;
 import com.android.systemui.util.InjectionInflationController;
 
+import com.android.internal.util.p404.fod.FodUtils;
+
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -382,7 +384,7 @@ public class KeyguardViewMediator extends SystemUI implements Dumpable {
     private IKeyguardDrawnCallback mDrawnCallback;
     private CharSequence mCustomMessage;
 
-    private final boolean mHasFod;
+    private boolean mHasFod;
 
     private final DeviceConfig.OnPropertiesChangedListener mOnPropertiesChangedListener =
             new DeviceConfig.OnPropertiesChangedListener() {
@@ -765,7 +767,7 @@ public class KeyguardViewMediator extends SystemUI implements Dumpable {
                 QuickStepContract.isGesturalMode(navigationModeController.addListener(mode -> {
                     mInGestureNavigationMode = QuickStepContract.isGesturalMode(mode);
                 }));
-	 mHasFod = context.getResources().getBoolean(com.android.internal.R.bool.config_needCustomFODView);
+        mHasFod = FodUtils.hasFodSupport(context);
     }
 
     public void userActivity() {

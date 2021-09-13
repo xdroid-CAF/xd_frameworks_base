@@ -22,6 +22,7 @@ import android.graphics.drawable.AnimatedVectorDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.View;
 
 import com.android.systemui.R;
 
@@ -43,6 +44,18 @@ public class AuthBiometricFingerprintView extends AuthBiometricView {
     }
 
     @Override
+    void onFinishInflateInternal() {
+        super.onFinishInflateInternal();
+        if (mHasFod) {
+            mIconView.setVisibility(View.INVISIBLE);
+            mIconView.setPadding(0, 0, 0, 0);
+            // Add IndicatorView above the biometric icon
+            removeView(mIndicatorView);
+            addView(mIndicatorView, indexOfChild(mIconView));
+        }
+    }
+
+    @Override
     protected int getStateForAfterError() {
         return STATE_AUTHENTICATING;
     }
@@ -60,11 +73,6 @@ public class AuthBiometricFingerprintView extends AuthBiometricView {
     @Override
     protected boolean supportsSmallDialog() {
         return false;
-    }
-
-    @Override
-    protected int getDescriptionTextId() {
-        return R.string.applock_fingerprint;
     }
 
     @Override

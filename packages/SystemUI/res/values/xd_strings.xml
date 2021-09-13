@@ -56,11 +56,16 @@
     <string name="statusbar_items_summary">Personalize your statusbar icon visibility</string>
 
     <!-- App Lock -->
-    <string name="applock_locked">&#160;is locked</string>
-    <string name="applock_fingerprint_face">, fingerprint or your face to unlock</string>
-    <string name="applock_face">&#160;or your face to unlock</string>
-    <string name="applock_fingerprint">&#160;or your fingerprint to unlock</string>
-    <string name="applock_credential">&#160;to unlock</string>
-    <string name="applock_unlock">Unlock</string>
+    <string name="applock_unlock">Unlock app</string>
+
+    <!-- Sync QS tile -->
+    <string name="quick_settings_sync_label">Sync</string>
+    <string name="accessibility_quick_settings_sync_off">Sync off.</string>
+    <string name="accessibility_quick_settings_sync_on">Sync on.</string>
+    <string name="accessibility_quick_settings_sync_changed_off">Sync turned off.</string>
+    <string name="accessibility_quick_settings_sync_changed_on">Sync turned on.</string>
+
+    <!-- Volume panel QS tile -->
+    <string name="quick_settings_volume_panel_label">Volume panel</string>
 
 </resources>

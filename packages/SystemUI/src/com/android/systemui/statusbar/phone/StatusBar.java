@@ -77,6 +77,8 @@ import android.content.res.Configuration;
 import android.database.ContentObserver;
 import android.graphics.Point;
 import android.graphics.PointF;
+import android.graphics.drawable.GradientDrawable;
+import android.hardware.fingerprint.IFingerprintService;
 import android.media.AudioAttributes;
 import android.metrics.LogMaker;
 import android.net.Uri;
@@ -150,6 +152,8 @@ import com.android.systemui.SystemUI;
 import com.android.systemui.SystemUIFactory;
 import com.android.systemui.ambientmusic.AmbientIndicationContainer;
 import com.android.systemui.assist.AssistManager;
+import com.android.systemui.biometrics.FODCircleViewImpl;
+import com.android.systemui.biometrics.FODCircleViewImplCallback;
 import com.android.systemui.broadcast.BroadcastDispatcher;
 import com.android.systemui.bubbles.BubbleController;
 import com.android.systemui.charging.WirelessChargingAnimation;
@@ -235,6 +239,7 @@ import com.android.systemui.volume.VolumeComponent;
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Executor;
@@ -597,6 +602,33 @@ public class StatusBar extends SystemUI implements DemoMode,
         }
     };
 
+    private ActivityManager mActivityManager;
+    private boolean mFodVisibility;
+    private boolean mIsDreaming;
+    private FODCircleViewImpl mFODCircleViewImpl;
+    private String mTopPkgClass;
+    private FODCircleViewImplCallback mFODCircleViewImplCallback =
+            new FODCircleViewImplCallback() {
+                @Override
+                public void onFODStatusChange(boolean isVisible) {
+                    boolean isFPClientActive = false;
+                    try {
+                        isFPClientActive = mFingerprintService.isClientActive();
+                    } catch (Exception e) {
+                        // do nothing.
+                    }
+                    mFodVisibility = isVisible;
+                    if (!isFPClientActive) {
+                        // if the client is not active, we have to nullify mTopPkgClass before
+                        // checking it against current foreground activity
+                        mTopPkgClass = null;
+                        return;
+                    } else if (isVisible && !mIsKeyguard && !mIsDreaming) {
+                        mTopPkgClass = getForegroundPackageNameAndClass();
+                    }
+                }
+            };
+
     private KeyguardUserSwitcher mKeyguardUserSwitcher;
     private final UserSwitcherController mUserSwitcherController;
     private final NetworkController mNetworkController;
@@ -625,6 +657,7 @@ public class StatusBar extends SystemUI implements DemoMode,
             new KeyguardUpdateMonitorCallback() {
                 @Override
                 public void onDreamingStateChanged(boolean dreaming) {
+                    mIsDreaming = dreaming;
                     if (dreaming) {
                         maybeEscalateHeadsUp();
                     }
@@ -649,6 +682,7 @@ public class StatusBar extends SystemUI implements DemoMode,
     private Lazy<NotificationShadeDepthController> mNotificationShadeDepthControllerLazy;
     private final BubbleController mBubbleController;
     private final BubbleController.BubbleExpandListener mBubbleExpandListener;
+    private final IFingerprintService mFingerprintService;
 
     private ActivityIntentHelper mActivityIntentHelper;
 
@@ -761,7 +795,8 @@ public class StatusBar extends SystemUI implements DemoMode,
             KeyguardIndicationController keyguardIndicationController,
             DismissCallbackRegistry dismissCallbackRegistry,
             Lazy<NotificationShadeDepthController> notificationShadeDepthControllerLazy,
-            StatusBarTouchableRegionManager statusBarTouchableRegionManager) {
+            StatusBarTouchableRegionManager statusBarTouchableRegionManager,
+            FODCircleViewImpl fodCircleViewImpl) {
         super(context);
         mNotificationsController = notificationsController;
         mLightBarController = lightBarController;
@@ -838,6 +873,7 @@ public class StatusBar extends SystemUI implements DemoMode,
         mUserInfoControllerImpl = userInfoControllerImpl;
         mIconPolicy = phoneStatusBarPolicy;
         mDismissCallbackRegistry = dismissCallbackRegistry;
+        mFODCircleViewImpl = fodCircleViewImpl;
 
         mBubbleExpandListener =
                 (isExpanding, key) -> {
@@ -847,6 +883,9 @@ public class StatusBar extends SystemUI implements DemoMode,
 
 
         DateTimeView.setReceiverHandler(timeTickHandler);
+
+        mFingerprintService = IFingerprintService.Stub.asInterface(
+                ServiceManager.getService(Context.FINGERPRINT_SERVICE));
     }
 
     @Override
@@ -1036,6 +1075,8 @@ public class StatusBar extends SystemUI implements DemoMode,
                         }
                     }
                 }, OverlayPlugin.class, true /* Allow multiple plugins */);
+                mActivityManager = mContext.getSystemService(ActivityManager.class);
+                mFODCircleViewImpl.registerCallback(mFODCircleViewImplCallback);
     }
 
     // ================================================================================
@@ -1342,7 +1383,8 @@ public class StatusBar extends SystemUI implements DemoMode,
         mActivityLaunchAnimator = new ActivityLaunchAnimator(
                 mNotificationShadeWindowViewController, this, mNotificationPanelViewController,
                 mNotificationShadeDepthControllerLazy.get(),
-                (NotificationListContainer) mStackScroller, mContext.getMainExecutor());
+                (NotificationListContainer) mStackScroller, mContext.getMainExecutor(),
+                mFODCircleViewImpl);
 
         // TODO: inject this.
         mPresenter = new StatusBarNotificationPresenter(mContext, mNotificationPanelViewController,
@@ -1853,6 +1895,12 @@ public class StatusBar extends SystemUI implements DemoMode,
             clearNotificationEffects();
         }
 
+        if (isExpanded && mFodVisibility) {
+            mFODCircleViewImpl.hideInDisplayFingerprintView();
+        } else if (!isExpanded && getForegroundPackageNameAndClass().equals(mTopPkgClass)) {
+            mFODCircleViewImpl.showInDisplayFingerprintView();
+        }
+
         if (!isExpanded) {
             mRemoteInputManager.onPanelCollapsed();
         }
@@ -2005,6 +2053,21 @@ public class StatusBar extends SystemUI implements DemoMode,
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.LOCKSCREEN_MEDIA_BLUR),
                     false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.QS_ROWS_PORTRAIT),
+                    false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.QS_ROWS_LANDSCAPE),
+                    false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.QS_COLUMNS_PORTRAIT),
+                    false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.QS_COLUMNS_LANDSCAPE),
+                    false, this, UserHandle.USER_ALL);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.QS_TILE_TITLE_VISIBILITY),
+                    false, this, UserHandle.USER_ALL);
         }
 
         @Override
@@ -2015,12 +2078,19 @@ public class StatusBar extends SystemUI implements DemoMode,
             } else if (uri.equals(Settings.System.getUriFor(
                     Settings.System.LOCKSCREEN_MEDIA_BLUR))) {
                 setLockScreenMediaBlurLevel();
+            } else if (uri.equals(Settings.System.getUriFor(Settings.System.QS_ROWS_PORTRAIT)) ||
+                    uri.equals(Settings.System.getUriFor(Settings.System.QS_ROWS_LANDSCAPE)) ||
+                    uri.equals(Settings.System.getUriFor(Settings.System.QS_COLUMNS_PORTRAIT)) ||
+                    uri.equals(Settings.System.getUriFor(Settings.System.QS_COLUMNS_LANDSCAPE)) ||
+                    uri.equals(Settings.System.getUriFor(Settings.System.QS_TILE_TITLE_VISIBILITY))) {
+                updateQsPanelResources();
             }
         }
 
         public void update() {
             setPulseOnNewTracks();
             setLockScreenMediaBlurLevel();
+            updateQsPanelResources();
         }
     }
 
@@ -2035,6 +2105,12 @@ public class StatusBar extends SystemUI implements DemoMode,
     private void setLockScreenMediaBlurLevel() {
         if (mMediaManager != null) {
             mMediaManager.setLockScreenMediaBlurLevel();
+        }
+    }
+
+    private void updateQsPanelResources() {
+        if (mQSPanel != null) {
+            mQSPanel.updateResources();
         }
     }
 
@@ -2517,6 +2593,11 @@ public class StatusBar extends SystemUI implements DemoMode,
     @Override
     public void onRecentsAnimationStateChanged(boolean running) {
         setInteracting(StatusBarManager.WINDOW_NAVIGATION_BAR, running);
+        if (!running && getForegroundPackageNameAndClass().equals(mTopPkgClass)) {
+            mFODCircleViewImpl.showInDisplayFingerprintView();
+        } else {
+            mFODCircleViewImpl.hideInDisplayFingerprintView();
+        }
     }
 
     protected BarTransitions getStatusBarTransitions() {
@@ -4511,5 +4592,19 @@ public class StatusBar extends SystemUI implements DemoMode,
     @Override
     public void suppressAmbientDisplay(boolean suppressed) {
         mDozeServiceHost.setDozeSuppressed(suppressed);
+    }
+
+    private String getForegroundPackageNameAndClass() {
+        List<ActivityManager.RunningTaskInfo> tasks = mActivityManager.getRunningTasks(1);
+        if (tasks.isEmpty()) {
+            return null;
+        }
+        ActivityManager.RunningTaskInfo currentTask = tasks.get(0);
+        ComponentName currentActivity = currentTask.topActivity;
+        if (currentActivity.getPackageName() != null) {
+            return currentActivity.getPackageName().trim() +
+                  currentActivity.getShortClassName().trim();
+        }
+        return null;
     }
 }
