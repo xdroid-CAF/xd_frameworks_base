@@ -52,4 +52,7 @@
     <!-- App Lock -->
     <java-symbol type="string" name="lockscreen_pattern_instructions" />
 
+    <!-- Screen recorder framerate limit -->
+    <java-symbol type="integer" name="config_screenRecorderMaxFramerate" />
+
 </resources>
