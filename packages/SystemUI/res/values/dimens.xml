@@ -430,7 +430,7 @@
     <!-- The width of the panel that holds the quick settings. -->
     <dimen name="qs_panel_width">@dimen/notification_panel_width</dimen>
 
-    <dimen name="volume_dialog_panel_transparent_padding_right">4dp</dimen>
+    <dimen name="volume_dialog_panel_transparent_padding_horizontal">4dp</dimen>
 
     <dimen name="volume_dialog_panel_transparent_padding">20dp</dimen>
 
@@ -464,6 +464,8 @@
 
     <dimen name="volume_tool_tip_arrow_corner_radius">2dp</dimen>
 
+    <dimen name="volume_row_app_icon_padding">8dp</dimen>
+
     <!-- Gravity for the notification panel -->
     <integer name="notification_panel_layout_gravity">0x31</integer><!-- center_horizontal|top -->
 
@@ -485,7 +487,7 @@
     <dimen name="qs_tile_height">106dp</dimen>
     <!--notification_side_paddings + notification_content_margin_start - (qs_quick_tile_size - qs_tile_icon_size) / 2 -->
     <dimen name="qs_tile_layout_margin_side">18dp</dimen>
-    <dimen name="qs_tile_margin_horizontal">18dp</dimen>
+    <dimen name="qs_tile_margin_horizontal">32dp</dimen>
     <dimen name="qs_tile_margin_horizontal_two_line">2dp</dimen>
     <dimen name="qs_tile_margin_vertical">2dp</dimen>
     <dimen name="qs_tile_margin_top_bottom">12dp</dimen>
