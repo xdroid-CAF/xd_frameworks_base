@@ -560,9 +560,6 @@ public final class ActivityRecord extends WindowToken implements WindowManagerSe
     public BoostFramework mPerf = null;
     public BoostFramework mPerf_iop = null;
 
-    private final boolean isLowRamDevice =
-             SystemProperties.getBoolean("ro.config.low_ram", false);
-
     boolean mVoiceInteraction;
 
     private int mPendingRelaunchCount;
