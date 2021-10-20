@@ -3394,7 +3394,6 @@ public final class ActiveServices {
     private final void bringDownServiceLocked(ServiceRecord r) {
         //Slog.i(TAG, "Bring down service:");
         //r.dump("  ");
-
         // Report to all of the connections that the service is no longer
         // available.
         ArrayMap<IBinder, ArrayList<ConnectionRecord>> connections = r.getConnections();
