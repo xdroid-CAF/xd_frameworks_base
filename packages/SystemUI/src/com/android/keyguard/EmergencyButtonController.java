@@ -178,26 +178,22 @@ public class EmergencyButtonController extends ViewController<EmergencyButton> {
     private void requestCellInfoUpdate(){
         TelephonyManager tmWithoutSim = mTelephonyManager
                 .createForSubscriptionId(SubscriptionManager.INVALID_SUBSCRIPTION_ID);
-        try {
-            tmWithoutSim.requestCellInfoUpdate(getContext().getMainExecutor(),
-                    new TelephonyManager.CellInfoCallback() {
-                        @Override
-                        public void onCellInfo(List<CellInfo> cellInfo) {
-                            if (KeyguardConstants.DEBUG_SIM_STATES) {
-                                Log.d(LOG_TAG, "requestCellInfoUpdate.onCellInfo cellInfoList.size="
-                                        + (cellInfo == null ? 0 : cellInfo.size()));
-                            }
-                            if (cellInfo == null || cellInfo.isEmpty()) {
-                                mIsCellAvailable = false;
-                            } else {
-                                mIsCellAvailable = true;
-                            }
-                            updateEmergencyCallButton();
+        tmWithoutSim.requestCellInfoUpdate(getContext().getMainExecutor(),
+                new TelephonyManager.CellInfoCallback() {
+                    @Override
+                    public void onCellInfo(List<CellInfo> cellInfo) {
+                        if (KeyguardConstants.DEBUG_SIM_STATES) {
+                            Log.d(LOG_TAG, "requestCellInfoUpdate.onCellInfo cellInfoList.size="
+                                    + (cellInfo == null ? 0 : cellInfo.size()));
                         }
-                    });
-        } catch (IllegalStateException exception) {
-            Log.e(LOG_TAG, "Fail to call TelephonyManager.requestCellInfoUpdate ", exception);
-        }
+                        if ( cellInfo == null || cellInfo.isEmpty()) {
+                            mIsCellAvailable = false;
+                        }else{
+                            mIsCellAvailable = true;
+                        }
+                        updateEmergencyCallButton();
+                    }
+                });
     }
 
     private boolean isEmergencyCapable() {
