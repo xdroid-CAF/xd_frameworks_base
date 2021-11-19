@@ -30,35 +30,27 @@ public class PixelPropsUtils {
 
     private static final Map<String, Object> propsToChange;
     private static final Map<String, Object> propsToChangePixel3XL;
+    private static final Map<String, Object> propsToChangePixel6Pro;
 
     private static final String[] packagesToChange = {
             "com.android.vending",
-            "com.breel.wallpapers20",
-            "com.google.android.apps.customization.pixel",
-            "com.google.android.apps.fitness",
-            "com.google.android.apps.photos",
-            "com.google.android.apps.recorder",
-            "com.google.android.apps.subscriptions.red",
-            "com.google.android.apps.tachyon",
-            "com.google.android.apps.turboadapter",
-            "com.google.android.apps.wallpaper.pixel",
-            "com.google.android.as",
-            "com.google.android.dialer",
-            "com.google.android.gms.location.history",
-            "com.google.android.inputmethod.latin",
-            "com.google.android.soundpicker",
-            "com.google.pixel.dynamicwallpapers",
-            "com.google.pixel.livewallpaper",
-            "com.google.android.apps.safetyhub",
-            "com.google.android.apps.turbo",
-            "com.google.android.apps.wallpaper",
-            "com.google.android.apps.maps",
-            "com.google.android.gms",
-            "com.google.android.apps.nexuslauncher"
+            "com.google.android.gms"
     };
 
     private static final String[] packagesToChangePixel3XL = {
             "com.google.android.googlequicksearchbox"
+    };
+
+    private static final String[] packagesToChangePixel6Pro = {
+            "com.google.android.inputmethod.latin",
+            "com.google.android.apps.photos",
+            "com.google.android.as",
+            "com.google.android.dialer",
+            "com.google.android.gms.location.history",
+            "com.google.android.soundpicker",
+            "com.google.android.apps.safetyhub",
+            "com.google.android.apps.turbo",
+            "com.google.android.apps.maps"
     };
 
     static {
@@ -76,6 +68,13 @@ public class PixelPropsUtils {
         propsToChangePixel3XL.put("PRODUCT", "crosshatch");
         propsToChangePixel3XL.put("MODEL", "Pixel 3 XL");
         propsToChangePixel3XL.put("FINGERPRINT", "google/crosshatch/crosshatch:11/RQ3A.211001.001/7641976:user/release-keys");
+        propsToChangePixel6Pro = new HashMap<>();
+        propsToChangePixel6Pro.put("BRAND", "google");
+        propsToChangePixel6Pro.put("MANUFACTURER", "Google");
+        propsToChangePixel6Pro.put("DEVICE", "raven");
+        propsToChangePixel6Pro.put("PRODUCT", "raven");
+        propsToChangePixel6Pro.put("MODEL", "Pixel 6 Pro");
+        propsToChangePixel6Pro.put("FINGERPRINT", "google/raven/raven:12/SD1A.210817.037/7862242:user/release-keys");
     }
 
     public static void setProps(String packageName) {
@@ -100,6 +99,20 @@ public class PixelPropsUtils {
                 Log.d(TAG, "Defining props for: " + packageName);
             }
             for (Map.Entry<String, Object> prop : propsToChangePixel3XL.entrySet()) {
+                String key = prop.getKey();
+                Object value = prop.getValue();
+                setPropValue(key, value);
+            }
+        }
+        // Set proper indexing fingerprint
+        if (packageName.equals("com.google.android.settings.intelligence")){
+            setPropValue("FINGERPRINT", Build.XDROID_FINGERPRINT);
+        }
+        if (Arrays.asList(packagesToChangePixel6Pro).contains(packageName)){
+            if (DEBUG){
+                Log.d(TAG, "Defining props for: " + packageName);
+            }
+            for (Map.Entry<String, Object> prop : propsToChangePixel6Pro.entrySet()) {
                 String key = prop.getKey();
                 Object value = prop.getValue();
                 setPropValue(key, value);
