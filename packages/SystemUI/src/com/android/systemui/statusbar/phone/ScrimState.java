@@ -106,7 +106,6 @@ public enum ScrimState {
     BOUNCER_SCRIMMED {
         @Override
         public void prepare(ScrimState previousState) {
-            Context context = mScrimBehind.getContext();
             mFrontTint = Utils.isDarkMode() ? Color.BLACK : Color.WHITE;
             mBehindAlpha = 0f;
             mBubbleAlpha = 0f;
