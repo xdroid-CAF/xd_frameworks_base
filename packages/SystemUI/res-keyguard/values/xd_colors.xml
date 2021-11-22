@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-     Copyright (C) 2021 xdroid, xyzprjkt
-     
+     Copyright (C) 2021 a xdroid, and xyzprjkt
+
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
      You may obtain a copy of the License at
+
           http://www.apache.org/licenses/LICENSE-2.0
+
      Unless required by applicable law or agreed to in writing, software
      distributed under the License is distributed on an "AS IS" BASIS,
      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,18 +15,6 @@
      limitations under the License.
 -->
 <resources>
-
-    <!-- Padding added to keyguard status area when Type clock is in use -->
-    <dimen name="keyguard_status_area_typeclock_padding">32dp</dimen>
-
-    <!-- Custom clock -->
-    <dimen name="custom_clock_left_padding">20dp</dimen>
-    <dimen name="ssos_clock_left_padding">20dp</dimen>
-
-    <dimen name="keyguard_eca_top_margin">18.0dip</dimen>
-    <dimen name="keyguard_password_height">80.0dip</dimen>
-    <dimen name="num_pad_key_margin_end">20.0dip</dimen>
-    <dimen name="num_pad_key_width">84.0dip</dimen>
-    <dimen name="num_pad_row_margin_bottom">16.0dip</dimen>
-
+    <color name="num_pad_key_color">?android:attr/colorBackground</color>
+    <color name="num_pad_key_color_special">?android:attr/colorAccent</color>
 </resources>

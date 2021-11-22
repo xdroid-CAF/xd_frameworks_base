@@ -4089,4 +4089,5 @@
 
   <java-symbol type="bool" name="config_supportForceLandscapeMode" />
   <java-symbol type="integer" name="config_forceLandscapeRotation" />
+
 </resources>
