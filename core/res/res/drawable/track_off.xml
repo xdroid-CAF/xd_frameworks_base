@@ -13,12 +13,8 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<selector
+<layer-list
     xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:state_checked="true"
-        android:drawable="@drawable/thumb_on" />
-    <item
-        android:state_checked="false"
-        android:drawable="@drawable/thumb_off" />
-</selector>
+        android:drawable="@drawable/track_off_background" />
+</layer-list>
