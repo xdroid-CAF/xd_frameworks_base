@@ -13,12 +13,9 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<selector
-    xmlns:android="http://schemas.android.com/apk/res/android">
-    <item
-        android:state_checked="true"
-        android:drawable="@drawable/thumb_on" />
-    <item
-        android:state_checked="false"
-        android:drawable="@drawable/thumb_off" />
-</selector>
+<shape android:tint="@color/switch_track_material"
+	android:shape="rectangle"
+	xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/white_disabled_material" />
+    <corners android:radius="99.0dip" />
+</shape>
