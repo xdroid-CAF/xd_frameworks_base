@@ -17,7 +17,8 @@
 <resources>
 
     <!-- xd. Frameworks -->
-    <color name="xd_fw_switch_bg">#FFFFFF</color>
-    <color name="xd_fw_switch_thumb">#F3F4F6</color>
+    <color name="xd_fw_switch_bg">#407E7E7E</color>
+    <color name="xd_fw_switch_thumb_on">#FFFFFF</color>
+    <color name="xd_fw_switch_thumb_off">#60FFFFFF</color>
 
 </resources>

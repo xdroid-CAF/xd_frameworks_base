@@ -26,7 +26,7 @@
                 android:height="16.0dip"
                 android:width="16.0dip" />
             <solid
-                android:color="?android:colorAccent" />
+                android:color="@color/xd_fw_switch_thumb_on" />
         </shape>
     </item>
 </layer-list>

@@ -16,8 +16,7 @@
 -->
 <resources>
 
-    <!-- xd. Frameworks -->
-    <color name="xd_fw_switch_bg">#000000</color>
-    <color name="xd_fw_switch_thumb">#131313</color>
+    <!-- xd. Frameworks 
+         dummy -->
 
 </resources>
