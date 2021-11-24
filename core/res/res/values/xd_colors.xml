@@ -18,5 +18,6 @@
 
     <!-- xd. Frameworks -->
     <color name="xd_fw_switch_bg">#FFFFFF</color>
+    <color name="xd_fw_switch_thumb">#F3F4F6</color>
 
 </resources>
