@@ -35,7 +35,6 @@ import android.os.SystemProperties;
 import android.os.SystemClock;
 import android.os.UserHandle;
 import android.os.Vibrator;
-import android.app.IUiModeManager;
 
 import com.android.internal.R;
 
@@ -164,18 +163,6 @@ public class Utils {
         public List<OverlayInfo> getOverlayInfosForTarget(String target, int userId)
                 throws RemoteException {
             return mService.getOverlayInfosForTarget(target, userId);
-        }
-    }
-
-    // Check if system is in dark mode
-    public static boolean isDarkMode() {
-        IUiModeManager uiModeManager = IUiModeManager.Stub.asInterface(
-                    ServiceManager.getService(Context.UI_MODE_SERVICE));
-        try {
-            return uiModeManager.getNightMode() == 2;
-        } catch (android.os.RemoteException e) {
-            // assume light mode
-            return false;
         }
     }
 }

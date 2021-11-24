@@ -41,8 +41,6 @@ import android.widget.ImageView;
 import com.android.systemui.Interpolators;
 import com.android.systemui.R;
 
-import com.android.settingslib.Utils;
-
 /**
  * An ImageView which does not have overlapping renderings commands and therefore does not need a
  * layer when alpha is changed.
@@ -57,7 +55,6 @@ public class KeyguardAffordanceView extends ImageView {
 
     protected final int mDarkIconColor;
     protected final int mNormalColor;
-    protected final int wallpaperColor;
     private final int mMinBackgroundRadius;
     private final Paint mCirclePaint;
     private final ArgbEvaluator mColorInterpolator;
@@ -130,16 +127,14 @@ public class KeyguardAffordanceView extends ImageView {
             int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         TypedArray a = context.obtainStyledAttributes(attrs, android.R.styleable.ImageView);
-        wallpaperColor = Utils.getColorAttrDefaultColor(context, R.attr.wallpaperTextColor);
 
         mCirclePaint = new Paint();
         mCirclePaint.setAntiAlias(true);
-        mCircleColor = wallpaperColor;
+        mCircleColor = 0xffffffff;
         mCirclePaint.setColor(mCircleColor);
 
-        mNormalColor = getNegativeColor(wallpaperColor);
-        mDarkIconColor = mNormalColor;
-        getDrawable().mutate().setColorFilter(mNormalColor, PorterDuff.Mode.SRC_ATOP);
+        mNormalColor = a.getColor(android.R.styleable.ImageView_tint, 0xffffffff);
+        mDarkIconColor = 0xff000000;
         mMinBackgroundRadius = mContext.getResources().getDimensionPixelSize(
                 R.dimen.keyguard_affordance_min_background_radius);
         mColorInterpolator = new ArgbEvaluator();
@@ -147,13 +142,6 @@ public class KeyguardAffordanceView extends ImageView {
                 0.3f);
 
         a.recycle();
-    }
-
-    private static int getNegativeColor(int color) {
-        int r = Math.round(255 - Color.red(color));
-        int g = Math.round(255 - Color.green(color));
-        int b = Math.round(255 - Color.blue(color));
-        return Color.argb(255, Math.min(r, 255), Math.min(g, 255), Math.min(b, 255));
     }
 
     public void setImageDrawable(@Nullable Drawable drawable, boolean tint) {
