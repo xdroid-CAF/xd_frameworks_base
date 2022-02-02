@@ -22,11 +22,5 @@
     <!-- In-display Fingerprint -->
     <java-symbol type="bool" name="config_supportsInDisplayFingerprint" />
 
-    <!-- Wheter device supports an gaming mode profiles -->
-    <bool name="config_gamingmode_performance">false</bool>
-
-    <!-- Wheter device supports an gaming mode profiles -->
-    <java-symbol type="bool" name="config_gamingmode_performance" />
-
 </resources>
 

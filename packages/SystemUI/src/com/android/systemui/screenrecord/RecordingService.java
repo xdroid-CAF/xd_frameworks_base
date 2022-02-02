@@ -26,6 +26,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.PixelFormat;
 import android.graphics.drawable.Icon;
 import android.media.MediaRecorder;
 import android.net.Uri;
@@ -35,6 +36,14 @@ import android.os.RemoteException;
 import android.os.UserHandle;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.WindowManager;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.android.internal.annotations.VisibleForTesting;
@@ -45,7 +54,6 @@ import com.android.systemui.settings.CurrentUserContextTracker;
 import com.android.systemui.statusbar.phone.KeyguardDismissUtil;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.concurrent.Executor;
 
 import javax.inject.Inject;
@@ -65,6 +73,8 @@ public class RecordingService extends Service implements MediaRecorder.OnInfoLis
     private static final String EXTRA_PATH = "extra_path";
     private static final String EXTRA_AUDIO_SOURCE = "extra_useAudio";
     private static final String EXTRA_SHOW_TAPS = "extra_showTaps";
+    private static final String EXTRA_SHOW_STOP_DOT = "extra_showStopDot";
+    private static final String EXTRA_LOW_QUALITY = "extra_lowQuality";
 
     private static final String ACTION_START = "com.android.systemui.screenrecord.START";
     private static final String ACTION_STOP = "com.android.systemui.screenrecord.STOP";
@@ -83,7 +93,13 @@ public class RecordingService extends Service implements MediaRecorder.OnInfoLis
     private final UiEventLogger mUiEventLogger;
     private final NotificationManager mNotificationManager;
     private final CurrentUserContextTracker mUserContextTracker;
-    private final RecordingServiceBinder mBinder;
+
+    private boolean mLowQuality;
+    private boolean mShowStopDot;
+    private boolean mIsDotAtRight;
+    private boolean mDotShowing;
+    private FrameLayout mFrameLayout;
+    private WindowManager mWindowManager;
 
     @Inject
     public RecordingService(RecordingController controller, @LongRunning Executor executor,
@@ -95,7 +111,8 @@ public class RecordingService extends Service implements MediaRecorder.OnInfoLis
         mNotificationManager = notificationManager;
         mUserContextTracker = userContextTracker;
         mKeyguardDismissUtil = keyguardDismissUtil;
-        mBinder = new RecordingServiceBinder();
+        mWindowManager = (WindowManager) userContextTracker.getCurrentUserContext()
+                .getSystemService(Context.WINDOW_SERVICE);
     }
 
     /**
@@ -109,12 +126,14 @@ public class RecordingService extends Service implements MediaRecorder.OnInfoLis
      * @param showTaps   True to make touches visible while recording
      */
     public static Intent getStartIntent(Context context, int resultCode,
-            int audioSource, boolean showTaps) {
+            int audioSource, boolean showTaps, boolean showStopDot, boolean lowQuality) {
         return new Intent(context, RecordingService.class)
                 .setAction(ACTION_START)
                 .putExtra(EXTRA_RESULT_CODE, resultCode)
                 .putExtra(EXTRA_AUDIO_SOURCE, audioSource)
-                .putExtra(EXTRA_SHOW_TAPS, showTaps);
+                .putExtra(EXTRA_SHOW_TAPS, showTaps)
+                .putExtra(EXTRA_SHOW_STOP_DOT, showStopDot)
+                .putExtra(EXTRA_LOW_QUALITY, lowQuality);
     }
 
     @Override
@@ -129,7 +148,28 @@ public class RecordingService extends Service implements MediaRecorder.OnInfoLis
         UserHandle currentUser = new UserHandle(mCurrentUserId);
         switch (action) {
             case ACTION_START:
-                doStartRecording(intent.getIntExtra(EXTRA_AUDIO_SOURCE, 0), intent.getBooleanExtra(EXTRA_SHOW_TAPS, false));
+                mAudioSource = ScreenRecordingAudioSource
+                        .values()[intent.getIntExtra(EXTRA_AUDIO_SOURCE, 0)];
+                Log.d(TAG, "recording with audio source" + mAudioSource);
+                mShowTaps = intent.getBooleanExtra(EXTRA_SHOW_TAPS, false);
+                mShowStopDot = intent.getBooleanExtra(EXTRA_SHOW_STOP_DOT, false);
+                mLowQuality = intent.getBooleanExtra(EXTRA_LOW_QUALITY, false);
+
+                mOriginalShowTaps = Settings.System.getInt(
+                        getApplicationContext().getContentResolver(),
+                        Settings.System.SHOW_TOUCHES, 0) != 0;
+
+                setTapsVisible(mShowTaps);
+                setStopDotVisible(mShowStopDot);
+
+                mRecorder = new ScreenMediaRecorder(
+                        mUserContextTracker.getCurrentUserContext(),
+                        mCurrentUserId,
+                        mAudioSource,
+                        this
+                );
+                setLowQuality(mLowQuality);
+                startRecording();
                 break;
 
             case ACTION_STOP_NOTIF:
@@ -148,7 +188,8 @@ public class RecordingService extends Service implements MediaRecorder.OnInfoLis
                 }
                 Log.d(TAG, "notifying for user " + userId);
                 stopRecording(userId);
-                stopForeground(true);
+                mNotificationManager.cancel(NOTIFICATION_RECORDING_ID);
+                stopSelf();
                 break;
 
             case ACTION_SHARE:
@@ -190,43 +231,14 @@ public class RecordingService extends Service implements MediaRecorder.OnInfoLis
         return Service.START_STICKY;
     }
 
-    protected void doStartRecording(int audioSource, boolean showTaps) {
-        int mCurrentUserId = mUserContextTracker.getCurrentUserContext().getUserId();
-        mAudioSource = ScreenRecordingAudioSource
-                .values()[audioSource];
-        Log.d(TAG, "recording with audio source" + mAudioSource);
-        mShowTaps = showTaps;
-
-        mOriginalShowTaps = Settings.System.getInt(
-                getApplicationContext().getContentResolver(),
-                Settings.System.SHOW_TOUCHES, 0) != 0;
-
-        setTapsVisible(mShowTaps);
-
-        mRecorder = new ScreenMediaRecorder(
-                mUserContextTracker.getCurrentUserContext(),
-                mCurrentUserId,
-                mAudioSource,
-                this
-        );
-        startRecording();
-    }
-
     @Override
     public IBinder onBind(Intent intent) {
-        return mBinder;
+        return null;
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
-        mController.addCallback((RecordingController.RecordingStateChangeCallback) mBinder);
-    }
-
-    @Override
-    public void onDestroy() {
-        mController.removeCallback((RecordingController.RecordingStateChangeCallback) mBinder);
-        super.onDestroy();
     }
 
     @VisibleForTesting
@@ -364,6 +376,7 @@ public class RecordingService extends Service implements MediaRecorder.OnInfoLis
 
     private void stopRecording(int userId) {
         setTapsVisible(mOriginalShowTaps);
+        setStopDotVisible(false);
         if (getRecorder() != null) {
             getRecorder().end();
             saveRecording(userId);
@@ -396,9 +409,95 @@ public class RecordingService extends Service implements MediaRecorder.OnInfoLis
         });
     }
 
+    private void setLowQuality(boolean turnOn) {
+        if (getRecorder() != null) {
+            getRecorder().setLowQuality(turnOn);
+        }
+    }
+
     private void setTapsVisible(boolean turnOn) {
         int value = turnOn ? 1 : 0;
         Settings.System.putInt(getContentResolver(), Settings.System.SHOW_TOUCHES, value);
+    }
+
+    private void setStopDotVisible(boolean turnOn) {
+        if (turnOn) {
+            showDot();
+        } else if (mDotShowing) {
+            stopDot();
+        }
+    }
+
+    private void showDot() {
+        mDotShowing = true;
+        mIsDotAtRight = true;
+        final int size = (int) (this.getResources()
+                .getDimensionPixelSize(R.dimen.screenrecord_dot_size));
+        WindowManager.LayoutParams params = new WindowManager.LayoutParams(
+                WindowManager.LayoutParams.WRAP_CONTENT,
+                WindowManager.LayoutParams.WRAP_CONTENT,
+                WindowManager.LayoutParams.TYPE_PHONE,
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE // don't get softkey inputs
+                | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, // allow outside inputs
+                PixelFormat.TRANSLUCENT);
+        params.gravity = Gravity.TOP | Gravity.RIGHT;
+        params.width = size;
+        params.height = size;
+
+        mFrameLayout = new FrameLayout(this);
+
+        mWindowManager.addView(mFrameLayout, params);
+        final LayoutInflater inflater =
+                (LayoutInflater) mUserContextTracker.getCurrentUserContext()
+                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        inflater.inflate(R.layout.screenrecord_dot, mFrameLayout);
+
+        final ImageView dot = (ImageView) mFrameLayout.findViewById(R.id.dot);
+        dot.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                try {
+                    getStopPendingIntent().send();
+                } catch (PendingIntent.CanceledException e) {}
+            }
+        });
+
+        dot.setOnLongClickListener(new View.OnLongClickListener() {
+            public boolean onLongClick(View v) {
+                dot.setAnimation(null);
+                WindowManager.LayoutParams params =
+                        (WindowManager.LayoutParams) mFrameLayout.getLayoutParams();
+                params.gravity = Gravity.TOP | (mIsDotAtRight? Gravity.LEFT : Gravity.RIGHT);
+                mIsDotAtRight = !mIsDotAtRight;
+                mWindowManager.updateViewLayout(mFrameLayout, params);
+                dot.startAnimation(getDotAnimation());
+                return true;
+            }
+        });
+
+        dot.startAnimation(getDotAnimation());
+    }
+
+    private PendingIntent getStopPendingIntent() {
+        return PendingIntent.getService(this, REQUEST_CODE, getStopIntent(this),
+                                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+    }
+
+    private void stopDot() {
+        mDotShowing = false;
+        final ImageView dot = (ImageView) mFrameLayout.findViewById(R.id.dot);
+        if (dot != null) {
+            dot.setAnimation(null);
+            mWindowManager.removeView(mFrameLayout);
+        }
+    }
+
+    private Animation getDotAnimation() {
+        Animation anim = new AlphaAnimation(0.0f, 1.0f);
+        anim.setDuration(500);
+        anim.setStartOffset(100);
+        anim.setRepeatMode(Animation.REVERSE);
+        anim.setRepeatCount(Animation.INFINITE);
+        return anim;
     }
 
     /**
@@ -436,61 +535,4 @@ public class RecordingService extends Service implements MediaRecorder.OnInfoLis
         Log.d(TAG, "Media recorder info: " + what);
         onStartCommand(getStopIntent(this), 0, 0);
     }
-
-    private class RecordingServiceBinder extends IRemoteRecording.Stub implements RecordingController.RecordingStateChangeCallback {
-
-        private ArrayList<IRecordingCallback> mCallbackList = new ArrayList<>();
-
-        @Override
-        public void startRecording(int audioSource, boolean showTaps) throws RemoteException {
-            doStartRecording(audioSource, showTaps);
-        }
-
-        @Override
-        public void stopRecording() throws RemoteException {
-            RecordingService.this.startService(getStopIntent(RecordingService.this));
-        }
-
-        @Override
-        public boolean isRecording() throws RemoteException {
-            return mController.isRecording();
-        }
-
-        @Override
-        public boolean isStarting() throws RemoteException {
-            return mController.isStarting();
-        }
-
-        public void addRecordingCallback(IRecordingCallback callback) throws RemoteException {
-            if (!mCallbackList.contains(callback)) {
-                mCallbackList.add(callback);
-            }
-        }
-
-        public void removeRecordingCallback(IRecordingCallback callback) throws RemoteException {
-            mCallbackList.remove(callback);
-        }
-
-        @Override
-        public void onRecordingStart() {
-            for (IRecordingCallback callback : mCallbackList) {
-                try{
-                    callback.onRecordingStart();
-                } catch (RemoteException e) {
-                    // do nothing
-                }
-            }
-        }
-
-        @Override
-        public void onRecordingEnd() {
-            for (IRecordingCallback callback : mCallbackList) {
-                try{
-                    callback.onRecordingEnd();
-                } catch (RemoteException e) {
-                    // do nothing
-                }
-            }
-        }
-    } 
 }
